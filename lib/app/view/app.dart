@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kanban_board/cubit/language_cubit.dart';
+import 'package:kanban_board/cubit/task_cubit.dart';
 import 'package:kanban_board/cubit/theme_cubit.dart';
 import 'package:kanban_board/l10n/l10n.dart';
+import 'package:kanban_board/repositories/task_repository.dart';
 import 'package:kanban_board/theme/app_theme.dart';
 import 'package:kanban_board/utils/extensions.dart';
 import 'package:kanban_board/views/dashboard/cubit/dashboard_cubit.dart';
@@ -23,6 +25,10 @@ class App extends StatelessWidget {
         ),
         BlocProvider<DashboardCubit>(
           create: (context) => DashboardCubit(),
+        ),
+        BlocProvider<TaskCubit>(
+          create: (context) => TaskCubit(
+              TaskRepository()), // Provide TaskCubit with TaskRepository
         ),
       ],
       child: BlocBuilder<ThemeCubit, ThemeModeState>(

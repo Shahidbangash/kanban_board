@@ -32,3 +32,33 @@ extension IntExtensions on int? {
   /// Leaves given width of space
   Widget get width => SizedBox(width: this?.toDouble());
 }
+
+extension ProjectColorExtension on String {
+  static final Map<String, Color> _colorMap = {
+    'berry_red': const Color(0xFFb8256f),
+    'red': const Color(0xFFdb4035),
+    'orange': const Color(0xFFff9933),
+    'yellow': const Color(0xFFfad000),
+    'olive_green': const Color(0xFFafb83b),
+    'lime_green': const Color(0xFF7ecc49),
+    'green': const Color(0xFF299438),
+    'mint_green': const Color(0xFF6accbc),
+    'teal': const Color(0xFF158fad),
+    'sky_blue': const Color(0xFF14aaf5),
+    'light_blue': const Color(0xFF96c3eb),
+    'blue': const Color(0xFF4073ff),
+    'grape': const Color(0xFF884dff),
+    'violet': const Color(0xFFaf38eb),
+    'lavender': const Color(0xFFeb96eb),
+    'magenta': const Color(0xFFe05194),
+    'salmon': const Color(0xFFff8d85),
+    'charcoal': const Color(0xFF808080),
+    'grey': const Color(0xFFb8b8b8),
+    'taupe': const Color(0xFFccac93),
+  };
+
+  Color get toProjectColor {
+    return _colorMap[this] ??
+        Colors.black; // Default to black if color not found
+  }
+}
