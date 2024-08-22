@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kanban_board/cubit/language_cubit.dart';
 import 'package:kanban_board/cubit/theme_cubit.dart';
+import 'package:kanban_board/l10n/l10n.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -13,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Kanban Dashboard 🃏'),
@@ -38,11 +41,32 @@ class _HomeScreenState extends State<HomeScreen> {
               ];
             },
           ),
+          PopupMenuButton<String>(
+            onSelected: (String languageCode) {
+              context.read<LanguageCubit>().changeLocale(languageCode);
+            },
+            itemBuilder: (BuildContext context) {
+              return <PopupMenuEntry<String>>[
+                const PopupMenuItem<String>(
+                  value: 'en',
+                  child: Text('English'),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'es',
+                  child: Text('Spanish'),
+                ),
+                const PopupMenuItem<String>(
+                  value: 'de',
+                  child: Text('German'),
+                ),
+              ];
+            },
+          ),
         ],
       ),
-      endDrawer: const EndDrawerButton(),
-      body: const Center(
-        child: Text('Home Screen'),
+      // endDrawer: const EndDrawerButton(),
+      body: Center(
+        child: Text(l10n.lblKanbanBoard),
       ),
     );
   }

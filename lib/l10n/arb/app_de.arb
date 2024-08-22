@@ -1,8 +1,8 @@
 {
-    "@@locale": "en",
+    "@@locale": "de",
     "counterAppBarTitle": "Counter",
     "@counterAppBarTitle": {
         "description": "Text shown in the AppBar of the Counter Page"
     },
-    "lblKanbanBoard": "Kanban Board"
+    "lblKanbanBoard": "Kanban-Board"
 }
