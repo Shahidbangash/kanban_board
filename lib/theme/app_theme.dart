@@ -29,17 +29,11 @@ class AppTheme {
       ),
       scaffoldBackgroundColor: Colors.white,
 
-      // Custom AppBar theme for light mode
-      // appBarTheme: AppBarTheme(
-      //   color: Colors.white,
-      //   elevation: 0,
-      //   titleTextStyle: Theme.of(context).textTheme.titleMedium?.copyWith(
-      //         color: Colors.black,
-      //         fontSize: 20,
-      //         fontWeight: FontWeight.bold,
-      //       ),
-      // ),
-
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: Colors.white,
+        selectedItemColor: primaryColor,
+        unselectedItemColor: Colors.grey,
+      ),
       // Customize Button Theme for light mode
       buttonTheme: const ButtonThemeData(
         buttonColor: primaryColor,
@@ -53,6 +47,11 @@ class AppTheme {
           borderSide: BorderSide(color: primaryColor),
         ),
         labelStyle: TextStyle(color: primaryColor),
+      ),
+
+      appBarTheme: const AppBarTheme(
+        color: Colors.white,
+        elevation: 0,
       ),
     );
   }
@@ -85,18 +84,21 @@ class AppTheme {
         ),
       ),
 
+      bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        backgroundColor: Colors.black,
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.grey,
+        selectedIconTheme: IconThemeData(color: Colors.white),
+      ),
+
       // Custom AppBar theme for dark mode
       appBarTheme: AppBarTheme(
         color: Colors.black87,
         elevation: 0,
         titleTextStyle: GoogleFonts.poppins(
-          // ThemeData.dark().textTheme.copyWith(
-          // headline6: const TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w500,
           color: Colors.white,
-          // ),
-          // ),
         ),
       ),
     );

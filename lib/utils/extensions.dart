@@ -12,3 +12,23 @@ ThemeMode mapThemeStateToThemeMode(ThemeModeState themeState) {
       return ThemeMode.system;
   }
 }
+
+//   extension method for adding height and width to the context
+
+extension ContextExtension on BuildContext {
+  double get height => MediaQuery.of(this).size.height;
+  double get width => MediaQuery.of(this).size.width;
+}
+
+extension IntExtensions on int? {
+  /// Validate given int is not null and returns given value if null.
+  int validate({int value = 0}) {
+    return this ?? value;
+  }
+
+  /// Leaves given height of space
+  Widget get height => SizedBox(height: this?.toDouble());
+
+  /// Leaves given width of space
+  Widget get width => SizedBox(width: this?.toDouble());
+}

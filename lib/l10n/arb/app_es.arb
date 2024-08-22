@@ -4,6 +4,12 @@
     "@counterAppBarTitle": {
         "description": "Texto mostrado en la AppBar de la página del contador"
     },
-    "lblKanbanBoard": "Kanban Board"
+    "lblKanbanBoard": "Kanban Board",
+    "lblLanguage": "Idioma",
+    "lblProfile": "Perfil",
+    "lblTheme": "Tema",
+    "lblDark": "Oscuro",
+    "lblLight": "Claro",
+    "lblSystem": "Sistema"
 
 }

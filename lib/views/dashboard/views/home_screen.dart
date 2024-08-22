@@ -19,50 +19,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Kanban Dashboard 🃏'),
-        actions: [
-          PopupMenuButton<ThemeModeState>(
-            onSelected: (ThemeModeState mode) {
-              context.read<ThemeCubit>().toggleTheme(mode);
-            },
-            itemBuilder: (BuildContext context) {
-              return <PopupMenuEntry<ThemeModeState>>[
-                const PopupMenuItem<ThemeModeState>(
-                  value: ThemeModeState.light,
-                  child: Text('Light Mode'),
-                ),
-                const PopupMenuItem<ThemeModeState>(
-                  value: ThemeModeState.dark,
-                  child: Text('Dark Mode'),
-                ),
-                const PopupMenuItem<ThemeModeState>(
-                  value: ThemeModeState.system,
-                  child: Text('System Default'),
-                ),
-              ];
-            },
-          ),
-          PopupMenuButton<String>(
-            onSelected: (String languageCode) {
-              context.read<LanguageCubit>().changeLocale(languageCode);
-            },
-            itemBuilder: (BuildContext context) {
-              return <PopupMenuEntry<String>>[
-                const PopupMenuItem<String>(
-                  value: 'en',
-                  child: Text('English'),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'es',
-                  child: Text('Spanish'),
-                ),
-                const PopupMenuItem<String>(
-                  value: 'de',
-                  child: Text('German'),
-                ),
-              ];
-            },
-          ),
-        ],
       ),
       // endDrawer: const EndDrawerButton(),
       body: Center(
