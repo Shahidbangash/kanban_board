@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kanban_board/cubit/section_cubit.dart';
+import 'package:kanban_board/cubit/task_cubit.dart';
 import 'package:kanban_board/models/project_model.dart';
 import 'package:kanban_board/models/sections_model.dart';
+import 'package:kanban_board/repositories/task_repository.dart';
+import 'package:kanban_board/views/project_details/views/components/task_component.dart';
 
 class TaskListComponent extends StatelessWidget {
   const TaskListComponent({
@@ -17,6 +20,7 @@ class TaskListComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final taskCubit = TaskCubit(TaskRepository());
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -53,7 +57,10 @@ class TaskListComponent extends StatelessWidget {
                 ),
               ),
               MaterialButton(
-                onPressed: () {},
+                onPressed: () {
+                  // Trigger the creation of a new task using TaskCubit
+                  taskCubit.showAddTaskDialog(context);
+                },
                 padding: const EdgeInsets.all(4),
                 child: const Text(
                   'Add Task',
@@ -87,55 +94,66 @@ class TaskListComponent extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          // ListView.builder(
-          //   shrinkWrap: true,
-          //   itemCount: section..length,
-          //   itemBuilder: (context, index) {
-          //     final task = section.tasks[index];
-          //     return Container(
-          //       margin: const EdgeInsets.only(bottom: 8),
-          //       padding: const EdgeInsets.all(8),
-          //       decoration: BoxDecoration(
-          //         borderRadius: BorderRadius.circular(8),
-          //         color: const Color(0xFFE0E7FF),
-          //         border: Border.all(color: const Color(0xFFE2E8F0)),
-          //         boxShadow: const [
-          //           BoxShadow(
-          //             color: Color(0xFF171717).withOpacity(0.1),
-          //             spreadRadius: -2,
-          //             blurRadius: 8,
-          //             offset: Offset(0, 4),
-          //           ),
-          //           BoxShadow(
-          //             color: Color(0xFF171717).withOpacity(0.1),
-          //             spreadRadius: -2,
-          //             blurRadius: 4,
-          //             offset: Offset(0, 2),
-          //           ),
-          //         ],
-          //       ),
-          //       child: Column(
-          //         crossAxisAlignment: CrossAxisAlignment.start,
-          //         children: [
-          //           Text(
-          //             task.name,
-          //             style: const TextStyle(
-          //               fontSize: 16,
-          //               fontWeight: FontWeight.bold,
-          //             ),
-          //           ),
-          //           const SizedBox(height: 8),
-          //           Text(
-          //             task.description,
-          //             style: const TextStyle(
-          //               fontSize: 14,
-          //             ),
-          //           ),
-          //         ],
-          //       ),
-          //     );
-          //   },
-          // ),
+          Expanded(
+            child: BlocProvider(
+              create: (context) {
+                return taskCubit..fetchActiveTasks();
+              },
+              child: BlocBuilder<TaskCubit, TaskState>(
+                builder: (context, state) {
+                  if (state is TaskLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is TaskLoaded) {
+                    return ListView.builder(
+                      itemCount: state.tasks.length,
+                      itemBuilder: (context, index) {
+                        final task = state.tasks[index];
+                        if (task == null) {
+                          return const ListTile(
+                            title: Text('Error loading task'),
+                          );
+                        }
+                        // return Column(
+                        //   children: [
+                        //     ListTile(
+                        //       title: Text(task.content ?? 'Unnamed Task'),
+                        //       subtitle: Text(
+                        //         'Created at: ${task.createdAt?.toIso8601String() ?? 'Unknown'}',
+                        //       ),
+                        //     ),
+                        //     ElevatedButton(
+                        //       onPressed: () {
+                        //         taskCubit.closeTask(task.id!);
+                        //       },
+                        //       child: const Text('Close Task'),
+                        //     ),
+                        //     ElevatedButton(
+                        //       onPressed: () {
+                        //         taskCubit.reopenTask(task.id!);
+                        //       },
+                        //       child: const Text('Reopen Task'),
+                        //     ),
+                        //     ElevatedButton(
+                        //       onPressed: () {
+                        //         taskCubit.deleteTask(task.id!);
+                        //       },
+                        //       child: const Text('Delete Task'),
+                        //       // style:
+                        //       // ElevatedButton.styleFrom(primary: Colors.red),
+                        //     ),
+                        //   ],
+                        // );
+                        return TaskComponent(task: task);
+                      },
+                    );
+                  } else if (state is TaskError) {
+                    return Center(child: Text('Error: ${state.error}'));
+                  }
+                  return Container();
+                },
+              ),
+            ),
+          ),
         ],
       ),
     );
