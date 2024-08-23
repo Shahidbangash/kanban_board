@@ -1,21 +1,21 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:kanban_board/models/project_model.dart';
-import 'package:kanban_board/repositories/task_repository.dart';
+import 'package:kanban_board/repositories/project_repository.dart';
 
 // States for TaskCubit
-abstract class TaskState extends Equatable {
-  const TaskState();
+abstract class ProjectState extends Equatable {
+  const ProjectState();
 
   @override
   List<Object?> get props => [];
 }
 
-class TaskInitial extends TaskState {}
+class ProjectInitial extends ProjectState {}
 
-class TaskLoading extends TaskState {}
+class ProjectLoading extends ProjectState {}
 
-class ProjectsLoaded extends TaskState {
+class ProjectsLoaded extends ProjectState {
   const ProjectsLoaded(this.projects);
   final List<Project> projects;
 
@@ -23,16 +23,16 @@ class ProjectsLoaded extends TaskState {
   List<Object?> get props => [projects];
 }
 
-class TaskCreated extends TaskState {
-  const TaskCreated(this.taskData);
+class ProjectCreated extends ProjectState {
+  const ProjectCreated(this.taskData);
   final Project? taskData;
 
   @override
   List<Object?> get props => [taskData];
 }
 
-class TaskError extends TaskState {
-  const TaskError(this.error);
+class ProjectError extends ProjectState {
+  const ProjectError(this.error);
   final String error;
 
   @override
@@ -40,39 +40,39 @@ class TaskError extends TaskState {
 }
 
 // TaskCubit Class
-class TaskCubit extends Cubit<TaskState> {
-  TaskCubit(this.taskRepository) : super(TaskInitial());
-  final TaskRepository taskRepository;
+class ProjectCubit extends Cubit<ProjectState> {
+  ProjectCubit(this.projectRepository) : super(ProjectInitial());
+  final ProjectRepository projectRepository;
 
   // Method to create a new project (task)
   Future<void> createProject(String projectName) async {
     try {
-      emit(TaskLoading()); // Emit loading state
+      emit(ProjectLoading()); // Emit loading state
 
       // Call the repository to create the project
-      final projectData = await taskRepository.createProject(projectName);
+      final projectData = await projectRepository.createProject(projectName);
 
       // Emit the created state with the project data
-      emit(TaskCreated(projectData));
+      emit(ProjectCreated(projectData));
     } catch (e) {
       // Emit error state if something goes wrong
-      emit(TaskError(e.toString()));
+      emit(ProjectError(e.toString()));
     }
   }
 
   // fetch all projects
   Future<void> fetchAllProjects() async {
     try {
-      emit(TaskLoading()); // Emit loading state
+      emit(ProjectLoading()); // Emit loading state
 
       // Call the repository to get all projects
-      final projects = await taskRepository.getAllProjects();
+      final projects = await projectRepository.getAllProjects();
 
       // Emit the loaded state with the list of projects
       emit(ProjectsLoaded(projects ?? []));
     } catch (e) {
       // Emit error state if something goes wrong
-      emit(TaskError(e.toString()));
+      emit(ProjectError(e.toString()));
     }
   }
 }

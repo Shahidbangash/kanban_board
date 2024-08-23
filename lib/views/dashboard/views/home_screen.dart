@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kanban_board/components/project_components.dart';
 import 'package:kanban_board/cubit/language_cubit.dart';
-import 'package:kanban_board/cubit/task_cubit.dart';
+import 'package:kanban_board/cubit/project_cubit.dart';
 import 'package:kanban_board/cubit/theme_cubit.dart';
 import 'package:kanban_board/l10n/l10n.dart';
 import 'package:kanban_board/utils/extensions.dart';
@@ -23,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Trigger fetching all projects using TaskCubit
-      context.read<TaskCubit>().fetchAllProjects();
+      context.read<ProjectCubit>().fetchAllProjects();
     });
   }
 
@@ -76,9 +76,9 @@ class _HomeScreenState extends State<HomeScreen> {
             //   },
             // ),
             // 10.height,
-            BlocBuilder<TaskCubit, TaskState>(
+            BlocBuilder<ProjectCubit, ProjectState>(
               builder: (context, state) {
-                if (state is TaskLoading) {
+                if (state is ProjectLoading) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (state is ProjectsLoaded) {
                   return Expanded(
@@ -93,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
                   );
-                } else if (state is TaskError) {
+                } else if (state is ProjectError) {
                   return Text('Error: ${state.error}');
                 }
                 return Container();

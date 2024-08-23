@@ -183,6 +183,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen>
                           Expanded(
                             child: TabBarView(
                               controller: _tabController,
+                              // viewportFraction: 0.9,
                               children: [
                                 ...state.sections.map((section) {
                                   if (section == null) {
@@ -190,9 +191,14 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen>
                                       child: Text('Error loading section'),
                                     );
                                   }
-                                  return TaskListComponent(
-                                    section: section,
-                                    project: widget.project,
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                    ),
+                                    child: TaskListComponent(
+                                      section: section,
+                                      project: widget.project,
+                                    ),
                                   );
                                   // return ListTile(
                                   //   title:

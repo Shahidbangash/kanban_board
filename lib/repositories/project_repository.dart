@@ -1,11 +1,8 @@
 import 'dart:developer';
-
-import 'package:http/src/response.dart';
 import 'package:kanban_board/models/project_model.dart';
-import 'package:kanban_board/models/sections_model.dart';
 import 'package:kanban_board/utils/network_utils.dart';
 
-class TaskRepository {
+class ProjectRepository {
   // Function to create a new project (task) using the Todoist API
   Future<Project?> createProject(String projectName) async {
     final response = await buildHttpResponse(
@@ -26,6 +23,7 @@ class TaskRepository {
     if (json is Map) {
       return Project.fromJson(json as Map<String, dynamic>);
     }
+    return null;
     // return Project.fromJson(json);
   }
 
