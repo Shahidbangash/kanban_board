@@ -10,6 +10,9 @@ class R {
   /// ![preview](file:///Users/admin/development/kanban_board/assets/language_icon.png)
   static const String ASSETS_LANGUAGE_ICON_PNG = 'assets/language_icon.png';
 
+  /// ![preview](file:///Users/admin/development/kanban_board/assets/no_task_icon.png)
+  static const String ASSETS_NO_TASK_ICON_PNG = 'assets/no_task_icon.png';
+
   /// ![preview](file:///Users/admin/development/kanban_board/assets/profile_icon.png)
   static const String ASSETS_PROFILE_ICON_PNG = 'assets/profile_icon.png';
 

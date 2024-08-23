@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:http/src/response.dart';
 import 'package:kanban_board/models/project_model.dart';
+import 'package:kanban_board/models/sections_model.dart';
 import 'package:kanban_board/utils/network_utils.dart';
 
 class TaskRepository {
@@ -28,11 +29,12 @@ class TaskRepository {
     // return Project.fromJson(json);
   }
 
-  //TODO: Add other task-related API calls here (e.g., getTasks, updateTask, deleteTask, etc.)
   // Function to get all projects using the Todoist API
   Future<List<Project>?> getAllProjects() async {
     try {
-      final response = await buildHttpResponse();
+      final response = await buildHttpResponse(
+        endPoint: 'projects', // Endpoint for fetching all projects
+      );
 
       // Handle the response and return the list of projects
       final data = await handleResponse(response);
