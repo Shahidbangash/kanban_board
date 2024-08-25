@@ -59,7 +59,11 @@ class TaskListComponent extends StatelessWidget {
               MaterialButton(
                 onPressed: () {
                   // Trigger the creation of a new task using TaskCubit
-                  taskCubit.showAddTaskDialog(context);
+                  taskCubit.showAddTaskDialog(
+                    context,
+                    section.id!,
+                    project.id!,
+                  );
                 },
                 padding: const EdgeInsets.all(4),
                 child: const Text(
@@ -97,7 +101,11 @@ class TaskListComponent extends StatelessWidget {
           Expanded(
             child: BlocProvider(
               create: (context) {
-                return taskCubit..fetchActiveTasks();
+                return taskCubit
+                  ..fetchActiveTasks(
+                    sectionId: section.id,
+                    projectId: project.id,
+                  );
               },
               child: BlocBuilder<TaskCubit, TaskState>(
                 builder: (context, state) {
@@ -143,7 +151,10 @@ class TaskListComponent extends StatelessWidget {
                         //     ),
                         //   ],
                         // );
-                        return TaskComponent(task: task);
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: TaskComponent(task: task),
+                        );
                       },
                     );
                   } else if (state is TaskError) {

@@ -5,10 +5,27 @@ import 'package:kanban_board/utils/network_utils.dart';
 
 class TaskRepository {
   /// Fetch active tasks from the Todoist API
-  Future<List<TaskModel>?> getActiveTasks() async {
+  Future<List<TaskModel>?> getActiveTasks({
+    String? sectionId,
+    String? projectId,
+  }) async {
     try {
+      var tasks = 'tasks';
+
+      if (sectionId != null) {
+        tasks += '?section_id=$sectionId';
+      }
+
+      if (projectId != null) {
+        if (sectionId != null) {
+          tasks += '&project_id=$projectId';
+        } else {
+          tasks += '?project_id=$projectId';
+        }
+      }
+
       final response = await buildHttpResponse(
-        endPoint: 'tasks', // Endpoint for fetching active tasks
+        endPoint: tasks, // Endpoint for fetching active tasks
       );
 
       final data = await handleResponse(response);
@@ -41,6 +58,9 @@ class TaskRepository {
     required String content,
     String? dueString,
     String? dueLang,
+    String? description,
+    String? sectionId,
+    String? projectId,
     int? priority,
   }) async {
     try {
@@ -52,6 +72,9 @@ class TaskRepository {
           'due_string': dueString,
           'due_lang': dueLang,
           'priority': priority,
+          'description': description,
+          'section_id': sectionId,
+          'project_id': projectId,
         },
       );
 

@@ -79,11 +79,17 @@ class TaskCubit extends Cubit<TaskState> {
   final TaskRepository taskRepository;
 
   // Method to fetch active tasks
-  Future<void> fetchActiveTasks() async {
+  Future<void> fetchActiveTasks({
+    String? sectionId,
+    String? projectId,
+  }) async {
     try {
       emit(TaskLoading());
 
-      final tasks = await taskRepository.getActiveTasks();
+      final tasks = await taskRepository.getActiveTasks(
+        sectionId: sectionId,
+        projectId: projectId,
+      );
 
       if (tasks != null) {
         emit(TaskLoaded(tasks));
@@ -100,6 +106,9 @@ class TaskCubit extends Cubit<TaskState> {
     required String content,
     String? dueString,
     String? dueLang,
+    String? description,
+    String? sectionId,
+    String? projectId,
     int? priority,
   }) async {
     try {
@@ -109,6 +118,9 @@ class TaskCubit extends Cubit<TaskState> {
         content: content,
         dueString: dueString,
         dueLang: dueLang,
+        description: description,
+        sectionId: sectionId,
+        projectId: projectId,
         priority: priority,
       );
 
@@ -198,8 +210,13 @@ class TaskCubit extends Cubit<TaskState> {
     }
   }
 
-  void showAddTaskDialog(BuildContext context) {
+  void showAddTaskDialog(
+    BuildContext context,
+    String sectionId,
+    String projectId,
+  ) {
     final contentController = TextEditingController();
+    final descriptionController = TextEditingController();
     final dueStringController = TextEditingController();
     final dueLangController = TextEditingController();
     final priorityController = TextEditingController();
@@ -231,58 +248,160 @@ class TaskCubit extends Cubit<TaskState> {
         //     ),
         //   ],
         // );
-        return Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Align(
-                child: Text('Create New Task'),
+        return StatefulBuilder(
+          builder: (context, state) {
+            return Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Align(
+                    alignment: Alignment.topLeft,
+                    child: Text(
+                      'Create New Task',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  10.height,
+                  TextField(
+                    controller: contentController,
+                    decoration:
+                        const InputDecoration(hintText: 'Enter task content'),
+                  ),
+                  10.height,
+                  TextField(
+                    controller: descriptionController,
+                    decoration: const InputDecoration(
+                      hintText: 'Enter task description (optional)',
+                    ),
+                    minLines: 3,
+                    maxLines: 5,
+                  ),
+                  10.height,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButton<String>(
+                          // value: dueLangController.text,
+                          hint: const Text('Select language'),
+                          underline: Container(
+                            height: 2,
+                            color: Colors.deepPurpleAccent,
+                          ),
+                          isExpanded: true,
+                          onChanged: (String? value) {
+                            dueLangController.text = value ?? '';
+                          },
+                          items: <String>[
+                            'en',
+                            'es',
+                            'de',
+                          ].map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                      10.width,
+                      Expanded(
+                        child: DropdownButton<String>(
+                          // value: dueLangController.text,
+                          hint: Text(
+                            dueLangController.text.isNotEmpty
+                                ? dueLangController.text
+                                : 'Priority',
+                          ),
+                          underline: Container(
+                            height: 2,
+                            color: Colors.deepPurpleAccent,
+                          ),
+                          isExpanded: true,
+                          onChanged: (String? value) {
+                            priorityController.text = value ?? '';
+                          },
+                          items: <String>['p1', 'p2', 'p3', 'p4']
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
+                  ),
+                  20.height,
+                  Row(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: MaterialButton(
+                          onPressed: () async {
+                            final picked = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime.now(),
+                              lastDate: DateTime(2025),
+                              builder: (context, child) {
+                                return Theme(
+                                  data: ThemeData.light().copyWith(
+                                    colorScheme: const ColorScheme.light(
+                                      primary: Colors.deepPurple,
+                                    ),
+                                    dialogBackgroundColor: Colors.white,
+                                  ),
+                                  child: child!,
+                                );
+                              },
+                            );
+                            if (picked != null) {
+                              dueStringController.text =
+                                  picked.toIso8601String();
+                              state(() {});
+                            }
+                          },
+                          child: Row(
+                            children: [
+                              const Icon(Icons.calendar_today),
+                              10.width,
+                              Text(
+                                dueStringController.text.isNotEmpty
+                                    ? dueStringController.text
+                                    : 'Select Due Date',
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  20.height,
+                  ElevatedButton(
+                    onPressed: () {
+                      createTask(
+                        content: contentController.text,
+                        dueString: dueStringController.text,
+                        dueLang: dueLangController.text,
+                        priority: int.tryParse(priorityController.text),
+                        description: descriptionController.text,
+                        sectionId: sectionId,
+                        projectId: projectId,
+                      );
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('Create'),
+                  ),
+                  10.height,
+                ],
               ),
-              10.height,
-              TextField(
-                controller: contentController,
-                decoration:
-                    const InputDecoration(hintText: 'Enter task content'),
-              ),
-              10.height,
-              TextField(
-                controller: dueStringController,
-                decoration: const InputDecoration(
-                  hintText: 'Enter due string (optional)',
-                ),
-              ),
-              10.height,
-              TextField(
-                controller: dueLangController,
-                decoration: const InputDecoration(
-                  hintText: 'Enter due language (optional)',
-                ),
-              ),
-              10.height,
-              TextField(
-                controller: priorityController,
-                decoration: const InputDecoration(
-                  hintText: 'Enter priority (optional)',
-                ),
-                keyboardType: TextInputType.number,
-              ),
-              10.height,
-              ElevatedButton(
-                onPressed: () {
-                  createTask(
-                    content: contentController.text,
-                    dueString: dueStringController.text,
-                    dueLang: dueLangController.text,
-                    priority: int.tryParse(priorityController.text),
-                  );
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Create'),
-              ),
-              10.height,
-            ],
-          ),
+            );
+          },
         );
       },
     );
