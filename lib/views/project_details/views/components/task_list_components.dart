@@ -59,11 +59,13 @@ class TaskListComponent extends StatelessWidget {
               MaterialButton(
                 onPressed: () {
                   // Trigger the creation of a new task using TaskCubit
-                  taskCubit.showAddTaskDialog(
-                    context,
-                    section.id!,
-                    project.id!,
-                  );
+
+                  //  context.read<TaskCubit>().showAddTaskDialog(context, sectionId, projectId)
+                  // taskCubit.showAddTaskDialog(
+                  //   context,
+                  //   section.id!,
+                  //   project.id!,
+                  // );
                 },
                 padding: const EdgeInsets.all(4),
                 child: const Text(

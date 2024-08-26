@@ -28,7 +28,8 @@ class App extends StatelessWidget {
         ),
         BlocProvider<ProjectCubit>(
           create: (context) => ProjectCubit(
-              ProjectRepository()), // Provide TaskCubit with TaskRepository
+            ProjectRepository(),
+          ), // Provide TaskCubit with TaskRepository
         ),
       ],
       child: BlocBuilder<ThemeCubit, ThemeModeState>(

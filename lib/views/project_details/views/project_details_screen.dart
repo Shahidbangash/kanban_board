@@ -183,7 +183,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen>
                           Expanded(
                             child: TabBarView(
                               controller: _tabController,
-                              // viewportFraction: 0.9,
+                              viewportFraction: 0.85,
                               children: [
                                 ...state.sections.map((section) {
                                   if (section == null) {

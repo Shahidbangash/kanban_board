@@ -4,6 +4,7 @@ import 'package:kanban_board/cubit/comment_cubit.dart';
 import 'package:kanban_board/models/task_model.dart';
 import 'package:kanban_board/repositories/comments_repository.dart';
 import 'package:kanban_board/utils/extensions.dart';
+import 'package:kanban_board/views/task_details/components/task_details.dart';
 
 class TaskDetailsScreen extends StatelessWidget {
   const TaskDetailsScreen({required this.task, super.key});
@@ -32,11 +33,52 @@ class TaskDetailsScreen extends StatelessWidget {
               child: Column(
                 children: [
                   10.height,
-                  Text(
-                    'Task Details',
-                    style: Theme.of(context).textTheme.titleSmall,
+                  CommonKeyValueRowWidget(
+                    title: 'Task Id',
+                    value: task.id ?? 'No content',
+                  ),
+                  10.height,
+                  CommonKeyValueRowWidget(
+                    title: 'Content',
+                    value: task.content ?? 'No content',
+                  ),
+                  10.height,
+                  CommonKeyValueRowWidget(
+                    title: 'Section Id',
+                    value: task.sectionId ?? 'No content',
+                  ),
+                  10.height,
+                  CommonKeyValueRowWidget(
+                    title: 'Project Id',
+                    value: task.projectId ?? 'No content',
+                  ),
+                  10.height,
+                  CommonKeyValueRowWidget(
+                    title: 'Priority Level',
+                    value: 'P${task.priority}',
                   ),
                   20.height,
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            'Content',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        // Divider(),
+                      ],
+                    ),
+                  ),
                   Expanded(
                     child: BlocBuilder<CommentCubit, CommentState>(
                       builder: (context, state) {
@@ -60,14 +102,12 @@ class TaskDetailsScreen extends StatelessWidget {
                               return Dismissible(
                                 // Each Dismissible must contain a Key. Keys allow Flutter to
                                 // uniquely identify widgets.
-                                key: Key(comment.id ?? ''),
+                                key: Key(comment.id ?? UniqueKey().toString()),
                                 // Provide a function that tells the app
                                 // what to do after an item has been swiped away.
                                 onDismissed: (direction) {
                                   // Remove the item from the data source.
-                                  // setState(() {
-                                  //   items.removeAt(index);
-                                  // });
+
                                   commentCubit.deleteComment(
                                     comment.id ?? '',
                                     task.id ?? '',
