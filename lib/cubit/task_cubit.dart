@@ -214,39 +214,39 @@ class TaskCubit extends Cubit<TaskState> {
   }
 
   // Since Api does not allow changing of section so we should delete task from section and create a new task in the new section
-  void onCardMoved({
+  Future<void> onCardMoved({
     required TaskModel task,
     required Section fromSection,
     required Section toSection,
-  }) {
+  }) async {
     log('Moving task ${task.content} from ${fromSection.name} to ${toSection.name}');
 
     log('Task ID: ${toSection.id}');
     if (fromSection.id == toSection.id) {
       return;
     }
-    this
-      ..createTask(
-        content: task.content ?? '',
-        dueString: task.due?.dateTime,
-        // dueLang: task.lan,
-        description: task.description,
-        sectionId: toSection.id,
-        projectId: toSection.projectId,
-        priority: task.priority,
-        // dueLang: task.due?.lang,
-      )
-      // ----- Once Created then delete the task from the original section -----
-      ..deleteTask(task.id!)
-      // now fetch the tasks again
-      ..fetchActiveTasks(
-        sectionId: fromSection.id,
-        projectId: fromSection.projectId,
-      )
-      ..fetchActiveTasks(
-        sectionId: toSection.id,
-        projectId: toSection.projectId,
-      );
+    await createTask(
+      content: task.content ?? '',
+      dueString: task.due?.dateTime,
+      // dueLang: task.lan,
+      description: task.description,
+      sectionId: toSection.id,
+      projectId: toSection.projectId,
+      priority: task.priority,
+      // dueLang: task.due?.lang,
+    );
+    // ----- Once Created then delete the task from the original section -----
+    await deleteTask(task.id!);
+    // now fetch the tasks again
+    await fetchActiveTasks(
+      sectionId: fromSection.id,
+      projectId: fromSection.projectId,
+    );
+
+    await fetchActiveTasks(
+      sectionId: toSection.id,
+      projectId: toSection.projectId,
+    );
     //  we need to fetch again to remove the task from the list
   }
 

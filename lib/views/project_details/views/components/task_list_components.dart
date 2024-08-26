@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,7 +7,6 @@ import 'package:kanban_board/models/project_model.dart';
 import 'package:kanban_board/models/sections_model.dart';
 import 'package:kanban_board/models/task_model.dart';
 import 'package:kanban_board/repositories/task_repository.dart';
-import 'package:kanban_board/theme/colors.dart';
 import 'package:kanban_board/views/project_details/views/components/task_component.dart';
 
 class TaskListComponent extends StatelessWidget {
@@ -140,9 +137,7 @@ class TaskListComponent extends StatelessWidget {
                     );
                   }
                 },
-                buildWhen: (previous, current) {
-                  return current is TaskLoaded || current is TaskLoading;
-                },
+                buildWhen: (_, state) => state is! TaskCreated,
                 builder: (context, state) {
                   if (state is TaskLoading) {
                     return const Center(child: CircularProgressIndicator());
