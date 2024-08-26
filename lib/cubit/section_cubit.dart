@@ -47,7 +47,7 @@ class SectionError extends SectionState {
 
 class SectionsLoaded extends SectionState {
   const SectionsLoaded(this.sections);
-  final List<Section?> sections;
+  final List<Section>? sections;
 
   @override
   List<Object?> get props => [sections];

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -5,23 +7,34 @@ import 'package:kanban_board/cubit/section_cubit.dart';
 import 'package:kanban_board/cubit/task_cubit.dart';
 import 'package:kanban_board/models/project_model.dart';
 import 'package:kanban_board/models/sections_model.dart';
+import 'package:kanban_board/models/task_model.dart';
 import 'package:kanban_board/repositories/task_repository.dart';
+import 'package:kanban_board/theme/colors.dart';
 import 'package:kanban_board/views/project_details/views/components/task_component.dart';
 
 class TaskListComponent extends StatelessWidget {
   const TaskListComponent({
     required this.section,
     required this.project,
+    required this.onCardMoved,
     super.key,
   });
 
   final Section section;
   final Project project;
+  final void Function({
+    required TaskModel task,
+    required Section fromSection,
+    required Section toSection,
+    required TaskCubit taskCubit,
+  }) onCardMoved;
 
   @override
   Widget build(BuildContext context) {
     final taskCubit = TaskCubit(TaskRepository());
     return Container(
+      width: 300,
+      margin: const EdgeInsets.all(8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
@@ -61,11 +74,11 @@ class TaskListComponent extends StatelessWidget {
                   // Trigger the creation of a new task using TaskCubit
 
                   //  context.read<TaskCubit>().showAddTaskDialog(context, sectionId, projectId)
-                  // taskCubit.showAddTaskDialog(
-                  //   context,
-                  //   section.id!,
-                  //   project.id!,
-                  // );
+                  taskCubit.showAddTaskDialog(
+                    context,
+                    section.id!,
+                    project.id!,
+                  );
                 },
                 padding: const EdgeInsets.all(4),
                 child: const Text(
@@ -109,53 +122,90 @@ class TaskListComponent extends StatelessWidget {
                     projectId: project.id,
                   );
               },
-              child: BlocBuilder<TaskCubit, TaskState>(
+              child: BlocConsumer<TaskCubit, TaskState>(
+                listener: (context, state) {
+                  if (state is TaskError) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(state.error),
+                      ),
+                    );
+                  }
+
+                  if (state is TaskCreated) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Task added successfully'),
+                      ),
+                    );
+                  }
+                },
+                buildWhen: (previous, current) {
+                  return current is TaskLoaded || current is TaskLoading;
+                },
                 builder: (context, state) {
                   if (state is TaskLoading) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (state is TaskLoaded) {
-                    return ListView.builder(
-                      itemCount: state.tasks.length,
-                      itemBuilder: (context, index) {
-                        final task = state.tasks[index];
-                        if (task == null) {
-                          return const ListTile(
-                            title: Text('Error loading task'),
-                          );
-                        }
-                        // return Column(
-                        //   children: [
-                        //     ListTile(
-                        //       title: Text(task.content ?? 'Unnamed Task'),
-                        //       subtitle: Text(
-                        //         'Created at: ${task.createdAt?.toIso8601String() ?? 'Unknown'}',
-                        //       ),
-                        //     ),
-                        //     ElevatedButton(
-                        //       onPressed: () {
-                        //         taskCubit.closeTask(task.id!);
-                        //       },
-                        //       child: const Text('Close Task'),
-                        //     ),
-                        //     ElevatedButton(
-                        //       onPressed: () {
-                        //         taskCubit.reopenTask(task.id!);
-                        //       },
-                        //       child: const Text('Reopen Task'),
-                        //     ),
-                        //     ElevatedButton(
-                        //       onPressed: () {
-                        //         taskCubit.deleteTask(task.id!);
-                        //       },
-                        //       child: const Text('Delete Task'),
-                        //       // style:
-                        //       // ElevatedButton.styleFrom(primary: Colors.red),
-                        //     ),
-                        //   ],
-                        // );
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: TaskComponent(task: task),
+                    final tasks = state.tasks;
+                    return DragTarget<(TaskModel, Section, Section)>(
+                      onAcceptWithDetails: (
+                        DragTargetDetails<(TaskModel, Section, Section)>
+                            details,
+                      ) {
+                        // final receivedTask = details.data;
+                        onCardMoved(
+                          task: details.data.$1,
+                          fromSection: details.data.$3,
+                          toSection: section,
+                          taskCubit: taskCubit,
+                        );
+                      },
+                      builder: (
+                        BuildContext context,
+                        List<(TaskModel, Section, Section)?> candidateData,
+                        rejectedData,
+                      ) {
+                        return ReorderableListView.builder(
+                          primary: true,
+                          onReorder: (oldIndex, newIndex) {
+                            if (tasks == null) {
+                              return;
+                            }
+
+                            final taskToMove = tasks.removeAt(oldIndex);
+                            tasks.insert(newIndex, taskToMove);
+                          },
+                          itemCount: tasks?.length ?? 0,
+                          itemBuilder: (context, index) {
+                            final task = state.tasks?[index];
+
+                            if (task == null) {
+                              return const SizedBox.shrink();
+                            }
+
+                            return Draggable<(TaskModel, Section, Section)>(
+                              key: Key(task.id.toString()),
+                              data: (task, section, section),
+                              feedback: Material(
+                                child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  color: Colors.blue,
+                                  child: Text(
+                                    task.content ?? '',
+                                    style: const TextStyle(color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                              childWhenDragging: const SizedBox.shrink(),
+                              child: Padding(
+                                padding: const EdgeInsets.only(bottom: 16),
+                                child: TaskComponent(
+                                  task: task,
+                                ),
+                              ),
+                            );
+                          },
                         );
                       },
                     );

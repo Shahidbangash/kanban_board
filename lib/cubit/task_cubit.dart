@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:kanban_board/models/sections_model.dart';
 import 'package:kanban_board/models/task_model.dart';
 import 'package:kanban_board/repositories/task_repository.dart';
 import 'package:kanban_board/utils/extensions.dart';
@@ -27,7 +30,7 @@ class TaskCreated extends TaskState {
 
 class TaskLoaded extends TaskState {
   const TaskLoaded(this.tasks);
-  final List<TaskModel?> tasks;
+  final List<TaskModel>? tasks;
 
   @override
   List<Object?> get props => [tasks];
@@ -126,7 +129,7 @@ class TaskCubit extends Cubit<TaskState> {
 
       if (task != null) {
         emit(TaskCreated(task));
-        await fetchActiveTasks(); // Re-fetch tasks to update the list
+        // await fetchActiveTasks(); // Re-fetch tasks to update the list
       } else {
         emit(const TaskError('Failed to create task.'));
       }
@@ -165,7 +168,7 @@ class TaskCubit extends Cubit<TaskState> {
 
       if (success) {
         emit(TaskClosed(taskId));
-        await fetchActiveTasks(); // Re-fetch tasks to update the list
+        // await fetchActiveTasks(); // Re-fetch tasks to update the list
       } else {
         emit(const TaskError('Failed to close task.'));
       }
@@ -183,7 +186,7 @@ class TaskCubit extends Cubit<TaskState> {
 
       if (success) {
         emit(TaskReopened(taskId));
-        await fetchActiveTasks(); // Re-fetch tasks to update the list
+        // await fetchActiveTasks(); // Re-fetch tasks to update the list
       } else {
         emit(const TaskError('Failed to reopen task.'));
       }
@@ -201,13 +204,50 @@ class TaskCubit extends Cubit<TaskState> {
 
       if (success) {
         emit(TaskDeleted(taskId));
-        await fetchActiveTasks(); // Re-fetch tasks to update the list
+        // await fetchActiveTasks(); // Re-fetch tasks to update the list
       } else {
         emit(const TaskError('Failed to delete task.'));
       }
     } catch (e) {
       emit(TaskError(e.toString()));
     }
+  }
+
+  // Since Api does not allow changing of section so we should delete task from section and create a new task in the new section
+  void onCardMoved({
+    required TaskModel task,
+    required Section fromSection,
+    required Section toSection,
+  }) {
+    log('Moving task ${task.content} from ${fromSection.name} to ${toSection.name}');
+
+    log('Task ID: ${toSection.id}');
+    if (fromSection.id == toSection.id) {
+      return;
+    }
+    this
+      ..createTask(
+        content: task.content ?? '',
+        dueString: task.due?.dateTime,
+        // dueLang: task.lan,
+        description: task.description,
+        sectionId: toSection.id,
+        projectId: toSection.projectId,
+        priority: task.priority,
+        // dueLang: task.due?.lang,
+      )
+      // ----- Once Created then delete the task from the original section -----
+      ..deleteTask(task.id!)
+      // now fetch the tasks again
+      ..fetchActiveTasks(
+        sectionId: fromSection.id,
+        projectId: fromSection.projectId,
+      )
+      ..fetchActiveTasks(
+        sectionId: toSection.id,
+        projectId: toSection.projectId,
+      );
+    //  we need to fetch again to remove the task from the list
   }
 
   void showAddTaskDialog(
