@@ -45,19 +45,19 @@ class TaskUpdated extends TaskState {
 }
 
 class TaskClosed extends TaskState {
-  const TaskClosed(this.taskId);
-  final String taskId;
+  const TaskClosed(this.taskModel);
+  final TaskModel taskModel;
 
   @override
-  List<Object?> get props => [taskId];
+  List<Object?> get props => [taskModel];
 }
 
 class TaskReopened extends TaskState {
-  const TaskReopened(this.taskId);
-  final String taskId;
+  const TaskReopened(this.task);
+  final TaskModel task;
 
   @override
-  List<Object?> get props => [taskId];
+  List<Object?> get props => [task];
 }
 
 class TaskDeleted extends TaskState {
@@ -140,17 +140,21 @@ class TaskCubit extends Cubit<TaskState> {
 
   // Method to update an existing task
   Future<void> updateTask(
-    String taskId,
+    TaskModel taskModel,
     Map<String, dynamic> updatedFields,
   ) async {
     try {
       emit(TaskLoading());
 
-      final task = await taskRepository.updateTask(taskId, updatedFields);
+      final task =
+          await taskRepository.updateTask(taskModel.id!, updatedFields);
 
       if (task != null) {
         emit(TaskUpdated(task));
-        await fetchActiveTasks(); // Re-fetch tasks to update the list
+        await fetchActiveTasks(
+          sectionId: task.sectionId,
+          projectId: task.projectId,
+        ); // Re-fetch tasks to update the list
       } else {
         emit(const TaskError('Failed to update task.'));
       }
@@ -160,15 +164,18 @@ class TaskCubit extends Cubit<TaskState> {
   }
 
   // Method to close a task
-  Future<void> closeTask(String taskId) async {
+  Future<void> closeTask(TaskModel task) async {
     try {
       emit(TaskLoading());
 
-      final success = await taskRepository.closeTask(taskId);
+      final success = await taskRepository.closeTask(task.id!);
 
       if (success) {
-        emit(TaskClosed(taskId));
-        // await fetchActiveTasks(); // Re-fetch tasks to update the list
+        emit(TaskClosed(task));
+        await fetchActiveTasks(
+          sectionId: task.sectionId,
+          projectId: task.projectId,
+        ); // Re-fetch tasks to update the list
       } else {
         emit(const TaskError('Failed to close task.'));
       }
@@ -178,15 +185,18 @@ class TaskCubit extends Cubit<TaskState> {
   }
 
   // Method to reopen a task
-  Future<void> reopenTask(String taskId) async {
+  Future<void> reopenTask(TaskModel task) async {
     try {
       emit(TaskLoading());
 
-      final success = await taskRepository.reopenTask(taskId);
+      final success = await taskRepository.reopenTask(task.id!);
 
       if (success) {
-        emit(TaskReopened(taskId));
-        // await fetchActiveTasks(); // Re-fetch tasks to update the list
+        emit(TaskReopened(task));
+        await fetchActiveTasks(
+          sectionId: task.sectionId,
+          projectId: task.projectId,
+        ); // Re-fetch tasks to update the list
       } else {
         emit(const TaskError('Failed to reopen task.'));
       }
