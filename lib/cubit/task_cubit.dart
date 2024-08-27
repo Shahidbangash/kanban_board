@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:kanban_board/models/sections_model.dart';
+import 'package:kanban_board/models/section_model.dart';
 import 'package:kanban_board/models/task_model.dart';
 import 'package:kanban_board/repositories/task_repository.dart';
 import 'package:kanban_board/utils/extensions.dart';
@@ -61,11 +61,11 @@ class TaskReopened extends TaskState {
 }
 
 class TaskDeleted extends TaskState {
-  const TaskDeleted(this.taskId);
-  final String taskId;
+  const TaskDeleted(this.taskModel);
+  final TaskModel taskModel;
 
   @override
-  List<Object?> get props => [taskId];
+  List<Object?> get props => [taskModel];
 }
 
 class TaskError extends TaskState {
@@ -128,8 +128,11 @@ class TaskCubit extends Cubit<TaskState> {
       );
 
       if (task != null) {
-        emit(TaskCreated(task));
-        // await fetchActiveTasks(); // Re-fetch tasks to update the list
+        // emit(TaskCreated(task));
+        await fetchActiveTasks(
+          projectId: task.projectId,
+          sectionId: task.sectionId,
+        ); // Re-fetch tasks to update the list
       } else {
         emit(const TaskError('Failed to create task.'));
       }
@@ -206,15 +209,18 @@ class TaskCubit extends Cubit<TaskState> {
   }
 
   // Method to delete a task
-  Future<void> deleteTask(String taskId) async {
+  Future<void> deleteTask(TaskModel task) async {
     try {
       emit(TaskLoading());
 
-      final success = await taskRepository.deleteTask(taskId);
+      final success = await taskRepository.deleteTask(task.id!);
 
       if (success) {
-        emit(TaskDeleted(taskId));
-        // await fetchActiveTasks(); // Re-fetch tasks to update the list
+        emit(TaskDeleted(task));
+        // await fetchActiveTasks(
+        //   projectId: task.projectId,
+        //   sectionId: task.sectionId,
+        // ); // Re-fetch tasks to update the list
       } else {
         emit(const TaskError('Failed to delete task.'));
       }
@@ -226,8 +232,8 @@ class TaskCubit extends Cubit<TaskState> {
   // Since Api does not allow changing of section so we should delete task from section and create a new task in the new section
   Future<void> onCardMoved({
     required TaskModel task,
-    required Section fromSection,
-    required Section toSection,
+    required SectionModel fromSection,
+    required SectionModel toSection,
   }) async {
     log('Moving task ${task.content} from ${fromSection.name} to ${toSection.name}');
 
@@ -246,17 +252,17 @@ class TaskCubit extends Cubit<TaskState> {
       // dueLang: task.due?.lang,
     );
     // ----- Once Created then delete the task from the original section -----
-    await deleteTask(task.id!);
+    await deleteTask(task);
     // now fetch the tasks again
     await fetchActiveTasks(
       sectionId: fromSection.id,
       projectId: fromSection.projectId,
     );
 
-    await fetchActiveTasks(
-      sectionId: toSection.id,
-      projectId: toSection.projectId,
-    );
+    // await fetchActiveTasks(
+    //   sectionId: toSection.id,
+    //   projectId: toSection.projectId,
+    // );
     //  we need to fetch again to remove the task from the list
   }
 

@@ -21,7 +21,7 @@ class ProjectComponent extends StatelessWidget {
     final isLightTheme = context.read<ThemeCubit>().isLightTheme;
     return GestureDetector(
       onTap: () {
-        if (project.id == null) {
+        if (project.idFromBackend == null) {
           return;
         }
 

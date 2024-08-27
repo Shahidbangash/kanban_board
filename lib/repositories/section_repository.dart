@@ -1,11 +1,11 @@
 import 'dart:developer';
-import 'package:kanban_board/models/sections_model.dart';
+import 'package:kanban_board/models/section_model.dart';
 import 'package:kanban_board/utils/network_utils.dart';
 
 class SectionRepository {
   /// get all sections from Api
   ///   // Fetch sections for a specific project
-  Future<List<Section>?> getSectionsForProject(String projectId) async {
+  Future<List<SectionModel>?> getSectionsForProject(String projectId) async {
     try {
       final response = await buildHttpResponse(
         endPoint:
@@ -20,14 +20,14 @@ class SectionRepository {
       }
       if (data is List) {
         // Convert JSON to a list of Section objects using Section.fromJson
-        return List<Section>.from(
+        return List<SectionModel>.from(
           data
               .map(
                 (sectionJson) =>
-                    Section.fromJson(sectionJson as Map<String, dynamic>?),
+                    SectionModel.fromJson(sectionJson as Map<String, dynamic>?),
               )
               .where((element) => element != null)
-              .cast<Section>()
+              .cast<SectionModel>()
               .toList(),
         );
       }
@@ -40,7 +40,7 @@ class SectionRepository {
   }
 
   /// Add a new section to a specific project
-  Future<Section?> addSection(String projectId, String sectionName) async {
+  Future<SectionModel?> addSection(String projectId, String sectionName) async {
     try {
       final response = await buildHttpResponse(
         endPoint: 'sections', // Endpoint for adding a section
@@ -57,7 +57,7 @@ class SectionRepository {
         throw Exception(data['message']);
       }
 
-      return Section.fromJson(data as Map<String, dynamic>?);
+      return SectionModel.fromJson(data as Map<String, dynamic>?);
     } catch (error, stackTrace) {
       log('Error at `addSection`: $error');
       log('Stack Trace: $stackTrace');
@@ -66,7 +66,10 @@ class SectionRepository {
   }
 
   /// Update an existing section
-  Future<Section?> updateSection(String sectionId, String updatedName) async {
+  Future<SectionModel?> updateSection(
+    String sectionId,
+    String updatedName,
+  ) async {
     try {
       final response = await buildHttpResponse(
         endPoint: 'sections/$sectionId', // Endpoint for updating a section
@@ -82,7 +85,7 @@ class SectionRepository {
         throw Exception(data['message']);
       }
 
-      return Section.fromJson(data as Map<String, dynamic>?);
+      return SectionModel.fromJson(data as Map<String, dynamic>?);
     } catch (error, stackTrace) {
       log('Error at `updateSection`: $error');
       log('Stack Trace: $stackTrace');

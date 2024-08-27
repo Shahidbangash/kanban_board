@@ -1,5 +1,9 @@
 import 'dart:developer';
+import 'package:isar/isar.dart';
 
+part 'task_model.g.dart';
+
+@collection
 class TaskModel {
   TaskModel({
     this.creatorId,
@@ -12,7 +16,8 @@ class TaskModel {
     this.description,
     this.due,
     this.duration,
-    this.id,
+    this.id = '',
+    this.idFromBackend,
     this.labels,
     this.order,
     this.priority,
@@ -22,24 +27,28 @@ class TaskModel {
     this.url,
   });
 
-  final String? creatorId;
-  final DateTime? createdAt;
-  final String? assigneeId;
-  final String? assignerId;
-  final int? commentCount;
-  final bool? isCompleted;
-  final String? content;
-  final String? description;
-  final Due? due;
-  final DurationModel? duration;
-  final String? id;
-  final List<String>? labels;
-  final int? order;
-  final int? priority;
-  final String? projectId;
-  final String? sectionId;
-  final String? parentId;
-  final String? url;
+  String? creatorId;
+  DateTime? createdAt;
+  String? assigneeId;
+  String? assignerId;
+  int? commentCount;
+  bool? isCompleted;
+  String? content;
+  String? description;
+  @embedded
+  Due? due;
+
+  @embedded
+  DurationModel? duration;
+  String id;
+  String? idFromBackend;
+  List<String>? labels;
+  int? order;
+  int? priority;
+  String? projectId;
+  String? sectionId;
+  String? parentId;
+  String? url;
 
   // Static constructor for safe parsing and error handling
   static TaskModel? fromJson(Map<String, dynamic>? json) {
@@ -58,7 +67,9 @@ class TaskModel {
         due: Due.fromJson(json['due'] as Map<String, dynamic>?),
         duration:
             DurationModel.fromJson(json['duration'] as Map<String, dynamic>?),
-        id: json['id'] as String?,
+        id: '${json['id']}',
+        idFromBackend:
+            json['id'] as String? ?? json['idFromBackend'] as String?,
         labels: (json['labels'] as List<dynamic>?)
             ?.map((e) => e.toString())
             .toList(),
@@ -99,10 +110,12 @@ class TaskModel {
       'section_id': sectionId,
       'parent_id': parentId,
       'url': url,
+      'idFromBackend': idFromBackend,
     };
   }
 }
 
+@embedded
 class Due {
   Due({
     this.date,
@@ -149,6 +162,7 @@ class Due {
   }
 }
 
+@embedded
 class DurationModel {
   DurationModel({
     this.amount,

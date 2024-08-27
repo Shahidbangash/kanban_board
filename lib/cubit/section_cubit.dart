@@ -4,7 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:kanban_board/models/project_model.dart';
-import 'package:kanban_board/models/sections_model.dart';
+import 'package:kanban_board/models/section_model.dart';
 import 'package:kanban_board/repositories/section_repository.dart';
 import 'package:kanban_board/views/project_details/views/components/add_section_ui.dart';
 // import 'section_repository.dart';
@@ -23,7 +23,7 @@ class SectionLoading extends SectionState {}
 
 class SectionAdded extends SectionState {
   const SectionAdded(this.section);
-  final Section section;
+  final SectionModel section;
 
   @override
   List<Object?> get props => [section];
@@ -31,7 +31,7 @@ class SectionAdded extends SectionState {
 
 class SectionUpdated extends SectionState {
   const SectionUpdated(this.section);
-  final Section section;
+  final SectionModel section;
 
   @override
   List<Object?> get props => [section];
@@ -47,7 +47,7 @@ class SectionError extends SectionState {
 
 class SectionsLoaded extends SectionState {
   const SectionsLoaded(this.sections);
-  final List<Section>? sections;
+  final List<SectionModel>? sections;
 
   @override
   List<Object?> get props => [sections];

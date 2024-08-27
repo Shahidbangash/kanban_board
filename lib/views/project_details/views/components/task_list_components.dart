@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kanban_board/cubit/section_cubit.dart';
 import 'package:kanban_board/cubit/task_cubit.dart';
 import 'package:kanban_board/models/project_model.dart';
-import 'package:kanban_board/models/sections_model.dart';
+import 'package:kanban_board/models/section_model.dart';
 import 'package:kanban_board/models/task_model.dart';
 import 'package:kanban_board/repositories/task_repository.dart';
 import 'package:kanban_board/views/project_details/views/components/task_component.dart';
@@ -17,12 +17,12 @@ class TaskListComponent extends StatelessWidget {
     super.key,
   });
 
-  final Section section;
+  final SectionModel section;
   final Project project;
   final void Function({
     required TaskModel task,
-    required Section fromSection,
-    required Section toSection,
+    required SectionModel fromSection,
+    required SectionModel toSection,
     required TaskCubit taskCubit,
   }) onCardMoved;
 
@@ -143,9 +143,10 @@ class TaskListComponent extends StatelessWidget {
                     return const Center(child: CircularProgressIndicator());
                   } else if (state is TaskLoaded) {
                     final tasks = state.tasks;
-                    return DragTarget<(TaskModel, Section, Section)>(
+                    return DragTarget<(TaskModel, SectionModel, SectionModel)>(
                       onAcceptWithDetails: (
-                        DragTargetDetails<(TaskModel, Section, Section)>
+                        DragTargetDetails<
+                                (TaskModel, SectionModel, SectionModel)>
                             details,
                       ) {
                         // final receivedTask = details.data;
@@ -158,18 +159,19 @@ class TaskListComponent extends StatelessWidget {
                       },
                       builder: (
                         BuildContext context,
-                        List<(TaskModel, Section, Section)?> candidateData,
+                        List<(TaskModel, SectionModel, SectionModel)?>
+                            candidateData,
                         rejectedData,
                       ) {
                         return ReorderableListView.builder(
                           primary: true,
                           onReorder: (oldIndex, newIndex) {
-                            if (tasks == null) {
-                              return;
-                            }
+                            // if (tasks == null) {
+                            //   return;
+                            // }
 
-                            final taskToMove = tasks.removeAt(oldIndex);
-                            tasks.insert(newIndex, taskToMove);
+                            // final taskToMove = tasks.removeAt(oldIndex);
+                            // tasks.insert(newIndex, taskToMove);
                           },
                           itemCount: tasks?.length ?? 0,
                           itemBuilder: (context, index) {
@@ -179,7 +181,8 @@ class TaskListComponent extends StatelessWidget {
                               return const SizedBox.shrink();
                             }
 
-                            return Draggable<(TaskModel, Section, Section)>(
+                            return Draggable<
+                                (TaskModel, SectionModel, SectionModel)>(
                               key: Key(task.id.toString()),
                               data: (task, section, section),
                               feedback: Material(

@@ -1,11 +1,16 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:isar/isar.dart';
 import 'package:kanban_board/utils/extensions.dart';
 
+part 'project_model.g.dart';
+
+@collection
 class Project {
   Project({
-    this.id,
+    this.id = '',
+    this.idFromBackend,
     this.name,
     this.commentCount,
     this.order,
@@ -18,19 +23,22 @@ class Project {
     this.url,
     this.parentId,
   });
-  final String? id;
-  final String? name;
-  final int? commentCount;
-  final int? order;
-  final String? color;
-  final bool? isShared;
-  final bool? isFavorite;
-  final bool? isInboxProject;
-  final bool? isTeamInbox;
-  final String? viewStyle;
-  final String? url;
-  final String? parentId;
+  String id;
 
+  String? idFromBackend;
+  String? name;
+  int? commentCount;
+  int? order;
+  String? color;
+  bool? isShared;
+  bool? isFavorite;
+  bool? isInboxProject;
+  bool? isTeamInbox;
+  String? viewStyle;
+  String? url;
+  String? parentId;
+
+  @ignore
   // Convert the color string to a Flutter Color using the extension
   Color get projectColor {
     return color?.toProjectColor ?? Colors.black;
@@ -47,7 +55,9 @@ class Project {
       }
 
       return Project(
-        id: json['id'] as String?,
+        id: '${json['id']}',
+        idFromBackend:
+            json['id'] as String? ?? json['idFromBackend'] as String?,
         name: json['name'] as String?,
         commentCount: int.tryParse(
           '${json['comment_count']}',
@@ -85,6 +95,7 @@ class Project {
       'view_style': viewStyle,
       'url': url,
       'parent_id': parentId,
+      'idFromBackend': idFromBackend,
     };
   }
 }

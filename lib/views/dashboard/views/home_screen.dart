@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:isar/isar.dart';
 import 'package:kanban_board/components/project_components.dart';
 import 'package:kanban_board/cubit/language_cubit.dart';
 import 'package:kanban_board/cubit/project_cubit.dart';
 import 'package:kanban_board/cubit/theme_cubit.dart';
 import 'package:kanban_board/l10n/l10n.dart';
+import 'package:kanban_board/models/project_model.dart';
 import 'package:kanban_board/utils/extensions.dart';
+import 'package:kanban_board/utils/isar.dart';
+import 'package:kanban_board/utils/middleware.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -17,13 +21,16 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   TextEditingController projectNameController = TextEditingController();
+  late Isar isar;
 
   @override
   void initState() {
     super.initState();
+    isar = IsarService().isarInstance;
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // SyncMiddleware(isar: isar);
       // Trigger fetching all projects using TaskCubit
-      context.read<ProjectCubit>().fetchAllProjects();
+      // context.read<ProjectCubit>().fetchAllProjects();
     });
   }
 
@@ -35,57 +42,34 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Kanban Dashboard 🃏'),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          context.read<ProjectCubit>().showAddProjectBottomBar(context);
+        },
+        child: const Icon(Icons.track_changes),
+      ),
       // endDrawer: const EndDrawerButton(),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            // TextField(
-            //   controller: projectNameController,
-            //   decoration: const InputDecoration(hintText: 'Enter Project Name'),
-            // ),
-            // 10.height,
-            // ElevatedButton(
-            //   onPressed: () {
-            //     // Trigger fetching all projects using TaskCubit
-
-            //   },
-            //   child: const Text('Get All Projects'),
-            // ),
-            // 10.height,
-            // ElevatedButton(
-            //   onPressed: () {
-            //     // Trigger the creation of the project using TaskCubit
-            //     context
-            //         .read<TaskCubit>()
-            //         .createProject(projectNameController.text);
-            //   },
-            //   child: const Text('Create Project'),
-            // ),
-            // 10.height,
-            // BlocBuilder<TaskCubit, TaskState>(
-            //   builder: (context, state) {
-            //     if (state is TaskLoading) {
-            //       return const CircularProgressIndicator();
-            //     } else if (state is TaskCreated) {
-            //       return Text('Project Created: ${state.taskData?.name ?? ''}');
-            //     } else if (state is TaskError) {
-            //       return Text('Error: ${state.error}');
-            //     }
-            //     return Container();
-            //   },
-            // ),
-            // 10.height,
-            BlocBuilder<ProjectCubit, ProjectState>(
-              builder: (context, state) {
-                if (state is ProjectLoading) {
+            StreamBuilder<List<Project>>(
+              stream: isar.projects.where().watch(fireImmediately: true),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
-                } else if (state is ProjectsLoaded) {
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else if (snapshot.hasData) {
+                  final projects = snapshot.data!;
+                  if (projects.isEmpty) {
+                    return const Center(child: Text('No Projects Available'));
+                  }
                   return Expanded(
                     child: ListView.builder(
-                      itemCount: state.projects.length,
+                      itemCount: projects.length,
                       itemBuilder: (context, index) {
-                        final project = state.projects[index];
+                        final project = projects[index];
                         return Container(
                           margin: const EdgeInsets.symmetric(vertical: 10),
                           child: ProjectComponent(project: project),
@@ -93,10 +77,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
                   );
-                } else if (state is ProjectError) {
-                  return Text('Error: ${state.error}');
                 }
-                return Container();
+                return const Center(child: Text('No data'));
               },
             ),
           ],

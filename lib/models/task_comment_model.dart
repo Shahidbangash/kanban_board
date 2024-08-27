@@ -1,21 +1,28 @@
 import 'dart:developer';
+import 'package:isar/isar.dart';
 
+part 'task_comment_model.g.dart';
+
+@collection
 class Comment {
   Comment({
     this.content,
-    this.id,
+    this.id = '',
     this.postedAt,
     this.projectId,
     this.taskId,
     this.attachment,
+    this.idFromBackend,
   });
 
-  final String? content;
-  final String? id;
-  final DateTime? postedAt;
-  final String? projectId;
-  final String? taskId;
-  final Attachment? attachment;
+  String? content;
+  String id;
+  String? idFromBackend;
+  DateTime? postedAt;
+  String? projectId;
+  String? taskId;
+  @embedded
+  Attachment? attachment;
 
   // Static constructor for error-handling
   static Comment? fromJson(Map<String, dynamic>? json) {
@@ -24,7 +31,8 @@ class Comment {
 
       return Comment(
         content: json['content'] as String?,
-        id: json['id'] as String?,
+        id: '${json['id']}',
+        idFromBackend: '${json['idFromBackend'] ?? json['id']}',
         postedAt: DateTime.tryParse('${json['posted_at']}'),
         projectId: json['project_id'] as String?,
         taskId: json['task_id'] as String?,
@@ -46,10 +54,12 @@ class Comment {
       'project_id': projectId,
       'task_id': taskId,
       'attachment': attachment?.toJson(),
+      'idFromBackend': idFromBackend,
     };
   }
 }
 
+@embedded
 class Attachment {
   Attachment({
     this.fileName,

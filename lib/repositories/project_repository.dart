@@ -6,7 +6,7 @@ class ProjectRepository {
   // Function to create a new project (task) using the Todoist API
   Future<Project?> createProject(String projectName) async {
     final response = await buildHttpResponse(
-      // endPoint: 'projects', // Endpoint for creating projects
+      endPoint: 'projects', // Endpoint for creating projects
       method: HttpMethod.post,
       request: {
         'name': projectName, // Request body contains the project name
@@ -25,6 +25,27 @@ class ProjectRepository {
     }
     return null;
     // return Project.fromJson(json);
+  }
+
+  // Function to update a project using the Todoist API
+  Future<Project?> updateProject(Project project) async {
+    final response = await buildHttpResponse(
+      endPoint: 'projects/${project.id}', // Endpoint for updating projects
+      method: HttpMethod.post,
+      request: project.toJson(), // Request body contains the project data
+    );
+
+    // Handle the response and return the decoded result
+    final json = await handleResponse(response);
+
+    if (json is Map && json.containsKey('error')) {
+      throw Exception(json['message'] ?? 'Something went wrong');
+    }
+
+    if (json is Map) {
+      return Project.fromJson(json as Map<String, dynamic>);
+    }
+    return null;
   }
 
   // Function to get all projects using the Todoist API
