@@ -169,6 +169,10 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
               stream: isar.sectionModels
                   .where()
                   .projectIdEqualTo(widget.projectId)
+                  .and()
+                  .idIsNotEmpty()
+                  .sortByOrder()
+                  .build()
                   .watch(fireImmediately: true),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -268,6 +272,8 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
             onSelected: (value) {
               if (value == 'delete') {
                 // Trigger the deletion of the section using SectionCubit
+
+                controller.removeGroup(columnData.id);
                 SectionCubit(SectionRepository())
                     .deleteSection(columnData.id, widget.projectId);
               }

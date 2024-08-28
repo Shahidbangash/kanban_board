@@ -131,9 +131,9 @@ class SectionCubit extends Cubit<SectionState> {
       final success = await sectionRepository.deleteSection(sectionId);
 
       if (success) {
-        emit(SectionDeleted(sectionId));
-
         await SyncMiddleware().deleteSection(sectionId);
+
+        emit(SectionDeleted(sectionId));
 
         // await fetchSectionsForProject(
         //   projectId,
