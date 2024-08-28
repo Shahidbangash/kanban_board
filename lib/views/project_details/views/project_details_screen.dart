@@ -302,7 +302,12 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    controller = AppFlowyBoardController(
+    controller = initBoardController();
+    boardController = AppFlowyBoardScrollController();
+  }
+
+  AppFlowyBoardController initBoardController() {
+    return AppFlowyBoardController(
       onMoveGroup: (fromGroupId, fromIndex, toGroupId, toIndex) {
         log('Moved group from $fromIndex to $toIndex');
       },
@@ -353,7 +358,6 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
         // here handle the move of the task
       },
     );
-    boardController = AppFlowyBoardScrollController();
   }
 
   // This function handles moving a task from one section to another
@@ -392,16 +396,19 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
 
   void _populateBoardWithSections(List<SectionModel> sections) {
     for (final section in sections) {
-      sectionTasks[section.idFromBackend ?? section.id] = IsarService()
+      controller.removeGroup(section.idFromBackend ?? section.id);
+      final taskList = IsarService()
           .isarInstance
           .taskModels
           .where()
           .sectionIdEqualTo(section.id)
           .findAll();
+      sectionTasks[section.idFromBackend ?? section.id] = taskList;
       final groupItems = sectionTasks[section.idFromBackend ?? section.id]!
           .map(TextItem.new)
           .toList();
 
+      // ignore: inference_failure_on_instance_creation
       final group = AppFlowyGroupData(
         id: section.idFromBackend ?? section.id,
         name: section.name ?? '',
@@ -409,6 +416,8 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
       );
       controller.addGroup(group);
     }
+
+    // controller = initBoardController();
   }
 
   @override
@@ -463,9 +472,18 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                     ),
                   );
                 } else {
-                  final sections = snapshot.data!;
-                  _populateBoardWithSections(sections);
-                  return _buildAppFlowyBoard();
+                  return StreamBuilder(
+                    stream: isar.taskModels
+                        .where()
+                        .projectIdEqualTo(widget.projectId)
+                        .build()
+                        .watch(fireImmediately: true),
+                    builder: (context, data) {
+                      final sections = snapshot.data!;
+                      _populateBoardWithSections(sections);
+                      return _buildAppFlowyBoard();
+                    },
+                  );
                 }
               },
             ),

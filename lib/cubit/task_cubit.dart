@@ -364,37 +364,37 @@ class TaskCubit extends Cubit<TaskState> {
                   10.height,
                   Row(
                     children: [
-                      Expanded(
-                        child: DropdownButton<String>(
-                          // value: dueLangController.text,
-                          hint: const Text('Select language'),
-                          underline: Container(
-                            height: 2,
-                            color: Colors.deepPurpleAccent,
-                          ),
-                          isExpanded: true,
-                          onChanged: (String? value) {
-                            dueLangController.text = value ?? '';
-                          },
-                          items: <String>[
-                            'en',
-                            'es',
-                            'de',
-                          ].map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                      10.width,
+                      // Expanded(
+                      //   child: DropdownButton<String>(
+                      //     // value: dueLangController.text,
+                      //     hint: const Text('Select language'),
+                      //     underline: Container(
+                      //       height: 2,
+                      //       color: Colors.deepPurpleAccent,
+                      //     ),
+                      //     isExpanded: true,
+                      //     onChanged: (String? value) {
+                      //       langua.text = value ?? '';
+                      //     },
+                      //     items: <String>[
+                      //       'en',
+                      //       'es',
+                      //       'de',
+                      //     ].map<DropdownMenuItem<String>>((String value) {
+                      //       return DropdownMenuItem<String>(
+                      //         value: value,
+                      //         child: Text(value),
+                      //       );
+                      //     }).toList(),
+                      //   ),
+                      // ),
+                      // 10.width,
                       Expanded(
                         child: DropdownButton<String>(
                           // value: dueLangController.text,
                           hint: Text(
-                            dueLangController.text.isNotEmpty
-                                ? dueLangController.text
+                            priorityController.text.isNotEmpty
+                                ? priorityController.text
                                 : 'Priority',
                           ),
                           underline: Container(
@@ -403,7 +403,9 @@ class TaskCubit extends Cubit<TaskState> {
                           ),
                           isExpanded: true,
                           onChanged: (String? value) {
-                            priorityController.text = value ?? '';
+                            state.call(() {
+                              priorityController.text = value ?? '';
+                            });
                           },
                           items: <String>['p1', 'p2', 'p3', 'p4']
                               .map<DropdownMenuItem<String>>((String value) {

@@ -170,7 +170,8 @@ class SyncMiddleware {
   }
 
   Future<void> _syncLocalWithRemoteSections(
-      List<SectionModel> remoteSections) async {
+    List<SectionModel> remoteSections,
+  ) async {
     await isar.write((isar) async {
       isar.sectionModels.putAll(remoteSections);
     });
