@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:isar/isar.dart' show Isar;
+import 'package:kanban_board/models/activity_model.dart';
 // For getting the application directory
 
 import 'package:kanban_board/models/project_model.dart';
@@ -36,6 +37,7 @@ class IsarService {
         SectionModelSchema,
         TaskModelSchema,
         CommentSchema,
+        ActivitySchema,
       ],
       directory: dir.path,
     );
@@ -45,15 +47,7 @@ class IsarService {
       log('Error: $error');
       log('Stacktrace: $stackTrace');
     }
-    return Isar.open(
-      schemas: [
-        ProjectSchema,
-        SectionModelSchema,
-        TaskModelSchema,
-        CommentSchema,
-      ],
-      directory: dir.path,
-    );
+    return open;
 
     // return isarInstance;
   }
@@ -66,7 +60,7 @@ class IsarService {
     // final taskRepository = TaskRepository();
     // final sectionRepository = SectionRepository();
     // final commentRepository = CommentRepository();
-    // final isar = await _initIsar();
+    final isar = await _initIsar();
     // Initialize middleware
     // final syncMiddleware = SyncMiddleware().s;
   }

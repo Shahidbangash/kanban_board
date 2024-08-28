@@ -10,6 +10,8 @@
     "lblTheme": "Tema",
     "lblDark": "Oscuro",
     "lblLight": "Claro",
-    "lblSystem": "Sistema"
+    "lblSystem": "Sistema",
+    "lblProjects": "Proyectos",
+    "lblAddTask":"Añadir Tarea"
 
 }

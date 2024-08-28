@@ -94,6 +94,26 @@ class SyncMiddleware {
     // await _syncLocalWithRemoteProjects(remoteProjects );
   }
 
+  Future<void> addCommentCountToTask(String? taskId) async {
+    if (taskId == null) {
+      return;
+    }
+    final comments = _isar.comments.where().taskIdEqualTo(taskId).findAll();
+
+    final task = _isar.taskModels.get(taskId);
+
+    task?.commentCount = comments.length;
+
+    if (task != null) {
+      await _isar.write((isar) async {
+        isar.taskModels.put(task);
+      });
+    }
+    // await _isar.write((isar) async {
+    // isar.taskModels.put(task);
+    // });
+  }
+
   Future<void> _syncTasks() async {
     final localTasks = _isar.taskModels.where().findAll();
 
@@ -128,8 +148,14 @@ class SyncMiddleware {
         await _sectionRepository.getSectionsForProject(projectId);
 
     if (remoteSections != null) {
-      await _syncLocalWithRemoteSections(remoteSections);
+      await syncLocalWithRemoteSections(remoteSections);
     }
+  }
+
+  Future<void> deleteSection(String sectionId) async {
+    await _isar.write((isar) async {
+      isar.sectionModels.delete(sectionId);
+    });
   }
 
   Future<void> syncComments() async {
@@ -172,7 +198,7 @@ class SyncMiddleware {
     });
   }
 
-  Future<void> _syncLocalWithRemoteSections(
+  Future<void> syncLocalWithRemoteSections(
     List<SectionModel> remoteSections,
   ) async {
     await _isar.write((isar) async {

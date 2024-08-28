@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:isar/isar.dart';
 import 'package:kanban_board/cubit/section_cubit.dart';
 import 'package:kanban_board/cubit/task_cubit.dart';
+import 'package:kanban_board/l10n/l10n.dart';
 import 'package:kanban_board/models/project_model.dart';
 import 'package:kanban_board/models/section_model.dart';
 import 'package:kanban_board/models/task_model.dart';
@@ -31,6 +32,7 @@ class TaskListComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final taskCubit = TaskCubit(TaskRepository());
+    final AppLocalizations appLocalizations = AppLocalizations.of(context);
     return Container(
       width: 300,
       margin: const EdgeInsets.all(8),
@@ -80,9 +82,9 @@ class TaskListComponent extends StatelessWidget {
                   );
                 },
                 padding: const EdgeInsets.all(4),
-                child: const Text(
-                  'Add Task',
-                  style: TextStyle(
+                child: Text(
+                  appLocalizations.lblAddTask,
+                  style: const TextStyle(
                     fontSize: 14,
                     color: Color(0xFF4F46E5),
                   ),
