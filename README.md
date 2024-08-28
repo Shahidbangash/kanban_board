@@ -12,10 +12,9 @@ A kanban board for tasks, where users can create, edit, and move tasks between d
 
 ## Getting Started 🚀
 
-This project contains 3 flavors:
+This project contains 2 flavors:
 
 - development
-- staging
 - production
 
 To run the desired flavor either use the launch configuration in VSCode/Android Studio or use the following commands:
@@ -34,6 +33,44 @@ $ flutter run --flavor production --target lib/main_production.dart
 _\*Kanban Board works on iOS, Android, Web, and Windows._
 
 ---
+
+<!-- Demo Video Heading -->
+## Demo Video 📹
+
+<div>
+    <a href="https://www.loom.com/share/1e156465b62345b28d4197b2bdd1b35b">
+      <p>Kanban Project Video Demo - Watch Video</p>
+    </a>
+    <a href="https://www.loom.com/share/1e156465b62345b28d4197b2bdd1b35b">
+      <img style="max-width:300px;" src="https://cdn.loom.com/sessions/thumbnails/1e156465b62345b28d4197b2bdd1b35b-bbb47290d246fb83-full-play.gif">
+    </a>
+  </div>
+
+
+## Features 🎯
+1. Create a new Project
+2. Create a Section
+3. Update a Section
+4. Delete a Section
+5. Create a Task
+6. Update a Task
+7. Delete a Task
+8. Move a Task to another Section
+9. Mark a Task as Done
+10. Mark a Task as Not Done
+11. Create a Task with a Due Date
+12. Add a Comment to a Task
+13. Delete a Comment from a Task
+14. Toggle Dark Mode
+15. Switch between different Languages (English 🇺🇸, Spanish 🇪🇸, German 🇩🇪)
+16. Switch Home Screen Layout (List View, Grid View)
+17. Start a Timer for a Task
+18. Stop a Timer for a Task
+19. Offline functionality (Local Database) using Isar Database
+
+
+
+
 
 ## Running Tests 🧪
 
@@ -165,6 +202,7 @@ flutter gen-l10n --arb-dir="lib/l10n/arb"
 ```
 
 Alternatively, run `flutter run` and code generation will take place automatically.
+
 
 [coverage_badge]: coverage_badge.svg
 [flutter_localizations_link]: https://api.flutter.dev/flutter/flutter_localizations/flutter_localizations-library.html
