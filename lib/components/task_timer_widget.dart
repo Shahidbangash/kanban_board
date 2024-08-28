@@ -187,12 +187,14 @@ class _TaskTimerWidgetState extends State<TaskTimerWidget> {
                   final intervalDuration = _calculateIntervalDuration(interval);
                   return ListTile(
                     title: Text(
-                      'Start: ${DateFormat('dd/MM/yyyy HH:mm').format(interval.startTime ?? DateTime.now())}',
+                      'Start: ${DateFormat('dd/MM/yyyy HH:mm').format(interval.startTime ?? DateTime.now())} ${interval.startTime?.timeAgo(context)}',
                     ),
                     subtitle: Text(
                       interval.isOngoing
                           ? 'Ongoing, Duration: ${_formatDuration(intervalDuration.inSeconds)}'
-                          : """End: ${DateFormat('dd/MM/yyyy HH:mm').format(interval.endTime ?? DateTime.now())}\nDuration: ${_formatDuration(intervalDuration.inSeconds)}""",
+                          : "End: ${DateFormat('dd/MM/yyyy HH:mm').format(interval.endTime ?? DateTime.now())} ${interval.endTime?.timeAgo(context)}"
+                              '\nDuration: ${_formatDuration(intervalDuration.inSeconds)}',
+                      // '\nTimeAgo: ${interval.startTime?.timeAgo(context)}',
                     ),
                   );
                 },

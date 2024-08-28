@@ -13,7 +13,7 @@ import 'package:kanban_board/repositories/task_repository.dart';
 import 'package:kanban_board/utils/extensions.dart';
 import 'package:kanban_board/utils/isar.dart';
 import 'package:kanban_board/utils/middleware.dart';
-import 'package:kanban_board/views/history/view/activity_history_screen.dart';
+import 'package:kanban_board/views/activity/view/activity_history_screen.dart';
 import 'package:kanban_board/views/project_details/views/components/task_component.dart';
 
 class ProjectDetailsScreen extends StatefulWidget {

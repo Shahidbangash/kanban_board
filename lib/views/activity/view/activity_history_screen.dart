@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kanban_board/views/history/view/activity_history_widget.dart';
+import 'package:kanban_board/views/activity/components/activity_history_widget.dart';
 
 class ActivityHistoryScreen extends StatefulWidget {
   const ActivityHistoryScreen({
@@ -22,9 +22,13 @@ class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
       appBar: AppBar(
         title: const Text('Activity History'),
       ),
-      body: ActivityHistoryWidget(
-        taskId: widget.taskId,
-        projectId: widget.projectId,
+      body: Container(
+        padding: const EdgeInsets.all(20),
+        // margin: const EdgeInsets.only(bottom: 10),
+        child: ActivityHistoryWidget(
+          taskId: widget.taskId,
+          projectId: widget.projectId,
+        ),
       ),
     );
   }
