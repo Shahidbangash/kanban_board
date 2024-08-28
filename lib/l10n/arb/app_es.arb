@@ -12,6 +12,7 @@
     "lblLight": "Claro",
     "lblSystem": "Sistema",
     "lblProjects": "Proyectos",
-    "lblAddTask":"Añadir Tarea"
+    "lblAddTask":"Añadir Tarea",
+    "lblCreateTask":"Crear Tarea"
 
 }

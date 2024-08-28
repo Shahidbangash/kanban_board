@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:kanban_board/l10n/l10n.dart';
 import 'package:kanban_board/models/activity_model.dart';
 import 'package:kanban_board/models/section_model.dart';
 import 'package:kanban_board/models/task_model.dart';
@@ -335,6 +336,8 @@ class TaskCubit extends Cubit<TaskState> {
     final dueLangController = TextEditingController();
     final priorityController = TextEditingController();
 
+    final AppLocalizations appLocalizations = AppLocalizations.of(context);
+
     if (isEdit) {
       contentController.text = task?.content ?? '';
       descriptionController.text = task?.description ?? '';
@@ -535,7 +538,7 @@ class TaskCubit extends Cubit<TaskState> {
                     },
                     child: isEdit
                         ? const Text('Update Task')
-                        : const Text('Create Task'),
+                        : Text(appLocalizations.lblCreateTask),
                   ),
                   10.height,
                 ],

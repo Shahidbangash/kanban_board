@@ -12,6 +12,7 @@
     "lblLight": "Licht",
     "lblSystem": "System",
     "lblProjects": "Projekte",
-    "lblAddTask":"Aufgabe hinzufügen"
+    "lblAddTask":"Aufgabe hinzufügen",
+    "lblCreateTask":"Aufgabe erstellen"
     
 }
