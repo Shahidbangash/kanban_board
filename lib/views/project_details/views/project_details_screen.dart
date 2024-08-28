@@ -228,8 +228,8 @@
 
 import 'dart:developer';
 
+import 'package:appflowy_board/appflowy_board.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:isar/isar.dart';
 import 'package:kanban_board/const/resource.dart';
 import 'package:kanban_board/cubit/section_cubit.dart';
@@ -243,8 +243,6 @@ import 'package:kanban_board/utils/extensions.dart';
 import 'package:kanban_board/utils/isar.dart';
 import 'package:kanban_board/utils/middleware.dart';
 import 'package:kanban_board/views/project_details/views/components/task_component.dart';
-import 'package:kanban_board/views/project_details/views/components/task_list_components.dart';
-import 'package:appflowy_board/appflowy_board.dart';
 
 class ProjectDetailsScreen extends StatefulWidget {
   const ProjectDetailsScreen({
@@ -437,7 +435,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          await SyncMiddleware(isar: isar).syncSections(widget.projectId);
+          await SyncMiddleware().syncSections(widget.projectId);
         },
         child: SizedBox(
           height: context.height,

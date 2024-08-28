@@ -1,10 +1,7 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kanban_board/cubit/theme_cubit.dart';
 import 'package:kanban_board/models/project_model.dart';
-import 'package:kanban_board/views/dashboard/cubit/dashboard_cubit.dart';
 import 'package:kanban_board/views/project_details/views/project_details_screen.dart';
 // import 'package:flutter/widgets.dart';
 
@@ -70,7 +67,7 @@ class ProjectComponent extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              project.id ?? '',
+              project.idFromBackend ?? project.id,
               style: const TextStyle(
                 fontSize: 12,
                 color: Colors.grey,

@@ -7,7 +7,6 @@ import 'package:kanban_board/models/section_model.dart';
 import 'package:kanban_board/models/task_model.dart';
 import 'package:kanban_board/repositories/task_repository.dart';
 import 'package:kanban_board/utils/extensions.dart';
-import 'package:kanban_board/utils/isar.dart';
 import 'package:kanban_board/utils/middleware.dart';
 
 // Task States
@@ -131,8 +130,7 @@ class TaskCubit extends Cubit<TaskState> {
 
       if (task != null) {
         // emit(TaskCreated(task));
-        await SyncMiddleware(isar: IsarService().isarInstance)
-            .syncLocalWithRemoteTasks([task]);
+        await SyncMiddleware().syncLocalWithRemoteTasks([task]);
         // await fetchActiveTasks(
         //   projectId: task.projectId,
         //   sectionId: task.sectionId,
@@ -155,8 +153,7 @@ class TaskCubit extends Cubit<TaskState> {
 
       final task = await taskRepository.updateTask(taskModel.id, updatedFields);
       if (task != null) {
-        await SyncMiddleware(isar: IsarService().isarInstance)
-            .syncLocalWithRemoteTasks([task]);
+        await SyncMiddleware().syncLocalWithRemoteTasks([task]);
       }
 
       if (task != null) {
@@ -185,8 +182,7 @@ class TaskCubit extends Cubit<TaskState> {
         emit(TaskClosed(task));
         task.isCompleted = true;
 
-        await SyncMiddleware(isar: IsarService().isarInstance)
-            .syncLocalWithRemoteTasks([
+        await SyncMiddleware().syncLocalWithRemoteTasks([
           task,
         ]);
         // await fetchActiveTasks(
@@ -213,8 +209,7 @@ class TaskCubit extends Cubit<TaskState> {
       if (success) {
         emit(TaskReopened(task));
         task.isCompleted = false;
-        await SyncMiddleware(isar: IsarService().isarInstance)
-            .syncLocalWithRemoteTasks([task]);
+        await SyncMiddleware().syncLocalWithRemoteTasks([task]);
         // await fetchActiveTasks(
         //   sectionId: task.sectionId,
         //   projectId: task.projectId,
@@ -232,8 +227,7 @@ class TaskCubit extends Cubit<TaskState> {
     try {
       emit(TaskLoading());
 
-      await SyncMiddleware(isar: IsarService().isarInstance)
-          .deleteTask(task.id);
+      await SyncMiddleware().deleteTask(task.id);
       final success =
           await taskRepository.deleteTask(task.idFromBackend ?? task.id);
 
@@ -287,12 +281,10 @@ class TaskCubit extends Cubit<TaskState> {
     // ----- Once Created then delete the task from the original section -----
     await deleteTask(task);
 
-    await SyncMiddleware(isar: IsarService().isarInstance)
-        .deleteTask(task.idFromBackend ?? task.id);
+    await SyncMiddleware().deleteTask(task.idFromBackend ?? task.id);
 
     if (taskModel != null) {
-      await SyncMiddleware(isar: IsarService().isarInstance)
-          .syncLocalWithRemoteTasks([taskModel]);
+      await SyncMiddleware().syncLocalWithRemoteTasks([taskModel]);
     }
 
     // now fetch the tasks again

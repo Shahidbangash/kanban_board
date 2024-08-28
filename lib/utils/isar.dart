@@ -1,18 +1,13 @@
 import 'dart:developer';
 
 import 'package:isar/isar.dart' show Isar;
-import 'package:path_provider/path_provider.dart';
 // For getting the application directory
 
 import 'package:kanban_board/models/project_model.dart';
 import 'package:kanban_board/models/section_model.dart';
 import 'package:kanban_board/models/task_comment_model.dart';
 import 'package:kanban_board/models/task_model.dart';
-import 'package:kanban_board/repositories/comments_repository.dart';
-import 'package:kanban_board/repositories/project_repository.dart';
-import 'package:kanban_board/repositories/section_repository.dart';
-import 'package:kanban_board/repositories/task_repository.dart';
-import 'package:kanban_board/utils/middleware.dart';
+import 'package:path_provider/path_provider.dart';
 
 class IsarService {
   factory IsarService() {
@@ -71,14 +66,8 @@ class IsarService {
     // final taskRepository = TaskRepository();
     // final sectionRepository = SectionRepository();
     // final commentRepository = CommentRepository();
-    final isar = await _initIsar();
+    // final isar = await _initIsar();
     // Initialize middleware
-    final syncMiddleware = SyncMiddleware(
-      isar: isar,
-      //   projectRepository: projectRepository,
-      //   taskRepository: taskRepository,
-      //   sectionRepository: sectionRepository,
-      //   commentRepository: commentRepository,
-    );
+    // final syncMiddleware = SyncMiddleware().s;
   }
 }

@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:kanban_board/app/app.dart';
 import 'package:kanban_board/l10n/l10n.dart';
 
 enum ThemeModeState { light, dark, system }

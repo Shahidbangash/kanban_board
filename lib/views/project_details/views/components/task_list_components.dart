@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:isar/isar.dart';
 import 'package:kanban_board/cubit/section_cubit.dart';
@@ -222,7 +221,7 @@ class TaskListComponent extends StatelessWidget {
           Expanded(
             child: RefreshIndicator(
               onRefresh: () async {
-                await SyncMiddleware(isar: IsarService().isarInstance)
+                await SyncMiddleware()
                     .syncSections(project.idFromBackend ?? project.id);
               },
               child: StreamBuilder<List<TaskModel>>(

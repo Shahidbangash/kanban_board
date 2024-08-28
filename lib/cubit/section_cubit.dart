@@ -129,9 +129,11 @@ class SectionCubit extends Cubit<SectionState> {
 
       if (success) {
         emit(SectionDeleted(sectionId));
-        fetchSectionsForProject(projectId); // Re-fetch sections after deletion
+        await fetchSectionsForProject(
+          projectId,
+        ); // Re-fetch sections after deletion
       } else {
-        emit(SectionError('Failed to delete section.'));
+        emit(const SectionError('Failed to delete section.'));
       }
     } catch (e) {
       emit(SectionError(e.toString()));

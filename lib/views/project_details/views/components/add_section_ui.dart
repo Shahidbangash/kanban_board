@@ -1,9 +1,6 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kanban_board/app/view/app.dart';
 import 'package:kanban_board/cubit/section_cubit.dart';
 import 'package:kanban_board/models/project_model.dart';
 
@@ -54,12 +51,12 @@ class AddSectionForm extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 if (_formKey.currentState?.validate() ?? false) {
-                  if (project.id == null) {
+                  if (project.idFromBackend == null) {
                     log('Project ID is null');
                     return;
                   }
                   sectionCubit.addSection(
-                    project.id!,
+                    project.idFromBackend ?? project.id,
                     _sectionNameController.text,
                   );
                 }

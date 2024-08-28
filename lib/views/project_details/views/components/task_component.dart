@@ -1,8 +1,6 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kanban_board/cubit/task_cubit.dart';
 import 'package:kanban_board/models/task_model.dart';
 import 'package:kanban_board/repositories/task_repository.dart';
@@ -83,13 +81,13 @@ class TaskComponent extends StatelessWidget {
                   icon: const Icon(Icons.more_vert),
                   itemBuilder: (context) {
                     return [
-                      PopupMenuItem(
+                      PopupMenuItem<void>(
                         child: const Text('Edit'),
                         onTap: () {
                           log('Edit task');
                         },
                       ),
-                      PopupMenuItem(
+                      PopupMenuItem<void>(
                         child: const Text('Delete'),
                         onTap: () {
                           log('Delete task');

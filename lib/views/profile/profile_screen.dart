@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kanban_board/app/view/app.dart';
 import 'package:kanban_board/const/resource.dart';
 import 'package:kanban_board/cubit/language_cubit.dart';
 import 'package:kanban_board/cubit/theme_cubit.dart';

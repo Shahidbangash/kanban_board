@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:isar/isar.dart';
 import 'package:kanban_board/components/project_components.dart';
-import 'package:kanban_board/cubit/language_cubit.dart';
 import 'package:kanban_board/cubit/project_cubit.dart';
-import 'package:kanban_board/cubit/theme_cubit.dart';
 import 'package:kanban_board/l10n/l10n.dart';
 import 'package:kanban_board/models/project_model.dart';
-import 'package:kanban_board/utils/extensions.dart';
 import 'package:kanban_board/utils/isar.dart';
 import 'package:kanban_board/utils/middleware.dart';
 
@@ -51,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
       // endDrawer: const EndDrawerButton(),
       body: RefreshIndicator(
         onRefresh: () async {
-          await SyncMiddleware(isar: isar).syncProjects();
+          await SyncMiddleware().syncProjects();
         },
         child: Padding(
           padding: const EdgeInsets.all(20),

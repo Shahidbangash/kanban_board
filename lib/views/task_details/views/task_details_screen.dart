@@ -8,7 +8,6 @@ import 'package:kanban_board/models/task_model.dart';
 import 'package:kanban_board/repositories/comments_repository.dart';
 import 'package:kanban_board/utils/extensions.dart';
 import 'package:kanban_board/utils/isar.dart';
-import 'package:kanban_board/utils/middleware.dart';
 import 'package:kanban_board/views/task_details/components/task_details.dart';
 
 class TaskDetailsScreen extends StatelessWidget {
@@ -20,7 +19,7 @@ class TaskDetailsScreen extends StatelessWidget {
     final contentController = TextEditingController();
     final commentCubit = CommentCubit(
       CommentRepository(),
-    )..fetchComments(task.id ?? '');
+    )..fetchComments(task.idFromBackend ?? task.id);
     return BlocProvider(
       create: (context) {
         return commentCubit;
@@ -44,7 +43,7 @@ class TaskDetailsScreen extends StatelessWidget {
                         10.height,
                         CommonKeyValueRowWidget(
                           title: 'Task Id',
-                          value: task.id ?? 'No content',
+                          value: task.idFromBackend ?? task.id,
                         ),
                         10.height,
                         CommonKeyValueRowWidget(
