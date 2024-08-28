@@ -148,7 +148,7 @@ class SyncMiddleware {
         await _sectionRepository.getSectionsForProject(projectId);
 
     if (remoteSections != null) {
-      await _syncLocalWithRemoteSections(remoteSections);
+      await syncLocalWithRemoteSections(remoteSections);
     }
   }
 
@@ -198,7 +198,7 @@ class SyncMiddleware {
     });
   }
 
-  Future<void> _syncLocalWithRemoteSections(
+  Future<void> syncLocalWithRemoteSections(
     List<SectionModel> remoteSections,
   ) async {
     await _isar.write((isar) async {

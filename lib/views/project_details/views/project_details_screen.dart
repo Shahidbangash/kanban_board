@@ -147,6 +147,15 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
       ),
       appBar: AppBar(
         title: const Text('Project Sections'),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              await SyncMiddleware().syncSections(widget.projectId);
+            },
+            icon: const Icon(Icons.sync),
+          ),
+          10.width,
+        ],
       ),
       body: RefreshIndicator(
         onRefresh: () async {

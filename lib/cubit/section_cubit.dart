@@ -91,10 +91,12 @@ class SectionCubit extends Cubit<SectionState> {
           await sectionRepository.addSection(projectId, sectionName);
 
       if (section != null) {
+        await SyncMiddleware().syncLocalWithRemoteSections([section]);
+
         emit(SectionAdded(section));
-        await fetchSectionsForProject(
-          projectId,
-        ); // Re-fetch sections to update the list
+        // await fetchSectionsForProject(
+        //   projectId,
+        // ); // Re-fetch sections to update the list
       } else {
         emit(const SectionError('Failed to add section'));
       }
