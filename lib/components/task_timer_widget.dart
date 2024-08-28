@@ -159,6 +159,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:isar/isar.dart';
 import 'package:kanban_board/models/task_model.dart';
+import 'package:kanban_board/utils/extensions.dart';
 import 'package:kanban_board/utils/isar.dart';
 
 class TaskTimerWidget extends StatefulWidget {
@@ -337,13 +338,50 @@ class _TaskTimerWidgetState extends State<TaskTimerWidget> {
             const SizedBox(height: 16),
             if (widget.task.timeIntervals.isNotEmpty)
               ...widget.task.timeIntervals.map(
-                (interval) => Text(
-                  'Interval: ${interval.startTime} - ${interval.isOngoing ? "Running" : interval.endTime}',
-                ),
+                (interval) {
+                  final intervalDuration = _calculateIntervalDuration(interval);
+                  return ListTile(
+                    title: Text(
+                      'Start: ${DateFormat('dd/MM/yyyy HH:mm').format(interval.startTime ?? DateTime.now())}',
+                    ),
+                    subtitle: Text(
+                      interval.isOngoing
+                          ? 'Ongoing, Duration: ${_formatDuration(intervalDuration.inSeconds)}'
+                          : """End: ${DateFormat('dd/MM/yyyy HH:mm').format(interval.endTime ?? DateTime.now())}\nDuration: ${_formatDuration(intervalDuration.inSeconds)}""",
+                    ),
+                  );
+                },
               ),
+            const Divider(),
+            5.height,
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Total Time Spent: ${_formatDuration(_seconds)}',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  Duration _calculateIntervalDuration(TimeInterval interval) {
+    if (interval.startTime == null) {
+      return Duration.zero;
+    }
+    final endTime = interval.isOngoing ? DateTime.now() : interval.endTime;
+    return endTime != null
+        ? endTime.difference(interval.startTime!)
+        : Duration.zero;
+  }
+
+  String _formatDuration(int totalSeconds) {
+    final duration = Duration(seconds: totalSeconds);
+    final hours = duration.inHours.toString().padLeft(2, '0');
+    final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return '$hours:$minutes:$seconds';
   }
 }

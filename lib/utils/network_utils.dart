@@ -55,10 +55,13 @@ Future<http.Response> buildHttpResponse({
 
     if (method == HttpMethod.post) {
       // log('Request: $request');
-      log('Request for endpoint $url: $request');
+      log('Request for endpoint $url : $request');
 
-      response =
-          await http.post(url, body: jsonEncode(request), headers: headers);
+      response = await http.post(
+        url,
+        body: request != null ? jsonEncode(request) : null,
+        headers: headers,
+      );
     } else if (method == HttpMethod.delete) {
       response = await http.delete(url, headers: headers);
     } else if (method == HttpMethod.put) {

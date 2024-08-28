@@ -18,6 +18,7 @@ class TaskComponent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var isCompleted = task.isCompleted ?? false;
     return InkWell(
       onTap: () {
         Navigator.of(context).push(
@@ -54,6 +55,21 @@ class TaskComponent extends StatelessWidget {
           children: [
             Row(
               children: [
+                Checkbox(
+                  value: isCompleted,
+                  onChanged: (newValue) {
+                    isCompleted = newValue ?? false;
+
+                    if (isCompleted) {
+                      TaskCubit(TaskRepository()).closeTask(task);
+                    } else {
+                      TaskCubit(TaskRepository()).reopenTask(task);
+                    }
+                    // {
+                    // 'is_completed': isCompleted,
+                    // });
+                  },
+                ),
                 Expanded(
                   child: Text(
                     task.content ?? '',

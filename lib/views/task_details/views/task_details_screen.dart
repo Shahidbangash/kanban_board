@@ -48,7 +48,7 @@ class TaskDetailsScreen extends StatelessWidget {
                         ),
                         10.height,
                         CommonKeyValueRowWidget(
-                          title: 'Content',
+                          title: 'Name',
                           value: task.content ?? 'No content',
                         ),
                         10.height,
@@ -63,6 +63,11 @@ class TaskDetailsScreen extends StatelessWidget {
                         ),
                         10.height,
                         CommonKeyValueRowWidget(
+                          title: 'Is Completed',
+                          value: task.projectId ?? 'No content',
+                        ),
+                        10.height,
+                        CommonKeyValueRowWidget(
                           title: 'Priority Level',
                           value: 'P${task.priority}',
                         ),
@@ -72,10 +77,13 @@ class TaskDetailsScreen extends StatelessWidget {
                             border: Border.all(color: Colors.grey),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Column(
+                          padding: const EdgeInsets.all(10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Padding(
-                                padding: EdgeInsets.all(8),
+                              const Align(
+                                alignment: Alignment.centerLeft,
+                                // alignment: CrossAxisAlignment.start,
                                 child: Text(
                                   'Content',
                                   style: TextStyle(
@@ -84,11 +92,17 @@ class TaskDetailsScreen extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              // Divider(),
+                              Text(
+                                'Description: ${task.description ?? 'No description'}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                ),
+                              ),
+                              // const Divider(),
                             ],
                           ),
                         ),
-                        10.height,
+                        20.height,
                         TaskTimerWidget(task: task),
                         10.height,
                         Align(

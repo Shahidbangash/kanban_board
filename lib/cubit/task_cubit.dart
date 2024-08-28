@@ -153,8 +153,11 @@ class TaskCubit extends Cubit<TaskState> {
     try {
       emit(TaskLoading());
 
-      final task =
-          await taskRepository.updateTask(taskModel.id!, updatedFields);
+      final task = await taskRepository.updateTask(taskModel.id, updatedFields);
+      if (task != null) {
+        await SyncMiddleware(isar: IsarService().isarInstance)
+            .syncLocalWithRemoteTasks([task]);
+      }
 
       if (task != null) {
         emit(TaskUpdated(task));
@@ -175,14 +178,21 @@ class TaskCubit extends Cubit<TaskState> {
     try {
       emit(TaskLoading());
 
-      final success = await taskRepository.closeTask(task.id!);
+      final success =
+          await taskRepository.closeTask(task.idFromBackend ?? task.id);
 
       if (success) {
         emit(TaskClosed(task));
-        await fetchActiveTasks(
-          sectionId: task.sectionId,
-          projectId: task.projectId,
-        ); // Re-fetch tasks to update the list
+        task.isCompleted = true;
+
+        await SyncMiddleware(isar: IsarService().isarInstance)
+            .syncLocalWithRemoteTasks([
+          task,
+        ]);
+        // await fetchActiveTasks(
+        //   sectionId: task.sectionId,
+        //   projectId: task.projectId,
+        // ); // Re-fetch tasks to update the list
       } else {
         emit(const TaskError('Failed to close task.'));
       }
@@ -196,14 +206,19 @@ class TaskCubit extends Cubit<TaskState> {
     try {
       emit(TaskLoading());
 
-      final success = await taskRepository.reopenTask(task.id!);
+      final success = await taskRepository.reopenTask(
+        task.idFromBackend ?? task.id,
+      );
 
       if (success) {
         emit(TaskReopened(task));
-        await fetchActiveTasks(
-          sectionId: task.sectionId,
-          projectId: task.projectId,
-        ); // Re-fetch tasks to update the list
+        task.isCompleted = false;
+        await SyncMiddleware(isar: IsarService().isarInstance)
+            .syncLocalWithRemoteTasks([task]);
+        // await fetchActiveTasks(
+        //   sectionId: task.sectionId,
+        //   projectId: task.projectId,
+        // ); // Re-fetch tasks to update the list
       } else {
         emit(const TaskError('Failed to reopen task.'));
       }
