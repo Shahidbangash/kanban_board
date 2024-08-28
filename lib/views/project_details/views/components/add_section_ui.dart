@@ -60,6 +60,8 @@ class AddSectionForm extends StatelessWidget {
                     _sectionNameController.text,
                   );
                 }
+
+                Navigator.pop(context);
               },
               child: const Text('Add Section'),
             ),

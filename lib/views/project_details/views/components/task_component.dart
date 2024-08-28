@@ -1,7 +1,10 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kanban_board/app/view/app.dart';
 import 'package:kanban_board/cubit/task_cubit.dart';
+import 'package:kanban_board/cubit/theme_cubit.dart';
 import 'package:kanban_board/models/task_model.dart';
 import 'package:kanban_board/repositories/task_repository.dart';
 import 'package:kanban_board/views/task_details/views/task_details_screen.dart';
@@ -31,7 +34,9 @@ class TaskComponent extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
-          color: const Color(0xFFFFFFFF),
+          color: context.read<ThemeCubit>().isLightTheme
+              ? const Color(0xFFFFFFFF)
+              : const Color(0xFF1E293B),
           border: Border.all(color: const Color(0xFFE2E8F0)),
           boxShadow: [
             BoxShadow(
@@ -72,7 +77,7 @@ class TaskComponent extends StatelessWidget {
                   child: Text(
                     task.content ?? '',
                     style: const TextStyle(
-                      fontSize: 18,
+                      fontSize: 17,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -82,13 +87,20 @@ class TaskComponent extends StatelessWidget {
                   itemBuilder: (context) {
                     return [
                       PopupMenuItem<void>(
-                        child: const Text('Edit'),
+                        child: const Text('Edit Task'),
                         onTap: () {
                           log('Edit task');
+                          TaskCubit(TaskRepository()).showAddTaskDialog(
+                            context,
+                            task.sectionId,
+                            task.projectId,
+                            task: task,
+                            isEdit: true,
+                          );
                         },
                       ),
                       PopupMenuItem<void>(
-                        child: const Text('Delete'),
+                        child: const Text('Delete Task'),
                         onTap: () {
                           log('Delete task');
 

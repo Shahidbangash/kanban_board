@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:kanban_board/models/project_model.dart';
 import 'package:kanban_board/models/section_model.dart';
 import 'package:kanban_board/repositories/section_repository.dart';
+import 'package:kanban_board/utils/middleware.dart';
 import 'package:kanban_board/views/project_details/views/components/add_section_ui.dart';
 // import 'section_repository.dart';
 
@@ -90,10 +91,12 @@ class SectionCubit extends Cubit<SectionState> {
           await sectionRepository.addSection(projectId, sectionName);
 
       if (section != null) {
+        await SyncMiddleware().syncLocalWithRemoteSections([section]);
+
         emit(SectionAdded(section));
-        await fetchSectionsForProject(
-          projectId,
-        ); // Re-fetch sections to update the list
+        // await fetchSectionsForProject(
+        //   projectId,
+        // ); // Re-fetch sections to update the list
       } else {
         emit(const SectionError('Failed to add section'));
       }
@@ -128,10 +131,13 @@ class SectionCubit extends Cubit<SectionState> {
       final success = await sectionRepository.deleteSection(sectionId);
 
       if (success) {
+        await SyncMiddleware().deleteSection(sectionId);
+
         emit(SectionDeleted(sectionId));
-        await fetchSectionsForProject(
-          projectId,
-        ); // Re-fetch sections after deletion
+
+        // await fetchSectionsForProject(
+        //   projectId,
+        // ); // Re-fetch sections after deletion
       } else {
         emit(const SectionError('Failed to delete section.'));
       }

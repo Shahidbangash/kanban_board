@@ -22,6 +22,7 @@ dependencies:
   isar: 4.0.0-dev.10
   isar_flutter_libs: ^4.0.0-dev.10
   path_provider: ^2.0.15
+  timeago: ^3.7.0
 
 dev_dependencies:
   bloc_test: ^9.1.6

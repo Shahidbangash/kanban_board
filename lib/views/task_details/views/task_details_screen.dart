@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:isar/isar.dart';
 import 'package:kanban_board/components/task_timer_widget.dart';
 import 'package:kanban_board/cubit/comment_cubit.dart';
@@ -176,7 +177,7 @@ class TaskDetailsScreen extends StatelessWidget {
                                             ),
                                       ),
                                       subtitle: Text(
-                                        'Posted at: ${comment.postedAt?.toIso8601String() ?? 'Unknown'}',
+                                        'Posted at: ${DateFormat('M/d/y').format(comment.postedAt ?? DateTime.now())} (${comment.postedAt?.timeAgo(context)})',
                                         style: Theme.of(context)
                                             .textTheme
                                             .bodyMedium

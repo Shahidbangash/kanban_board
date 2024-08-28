@@ -3,9 +3,12 @@ import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:kanban_board/l10n/l10n.dart';
+import 'package:kanban_board/models/activity_model.dart';
 import 'package:kanban_board/models/section_model.dart';
 import 'package:kanban_board/models/task_model.dart';
 import 'package:kanban_board/repositories/task_repository.dart';
+import 'package:kanban_board/utils/activity_services.dart';
 import 'package:kanban_board/utils/extensions.dart';
 import 'package:kanban_board/utils/middleware.dart';
 
@@ -157,11 +160,17 @@ class TaskCubit extends Cubit<TaskState> {
       }
 
       if (task != null) {
-        emit(TaskUpdated(task));
-        await fetchActiveTasks(
-          sectionId: task.sectionId,
+        await ActivityService().logActivity(
+          description: 'Task `${task.content}` Updated',
+          taskId: task.idFromBackend ?? task.id,
           projectId: task.projectId,
-        ); // Re-fetch tasks to update the list
+        );
+
+        emit(TaskUpdated(task));
+        // await fetchActiveTasks(
+        //   sectionId: task.sectionId,
+        //   projectId: task.projectId,
+        // ); // Re-fetch tasks to update the list
       } else {
         emit(const TaskError('Failed to update task.'));
       }
@@ -182,9 +191,14 @@ class TaskCubit extends Cubit<TaskState> {
         emit(TaskClosed(task));
         task.isCompleted = true;
 
-        await SyncMiddleware().syncLocalWithRemoteTasks([
-          task,
-        ]);
+        await SyncMiddleware().syncLocalWithRemoteTasks([task]);
+        await ActivityService().logActivity(
+          description:
+              'Task `${task.content}` Completed in `${task.sectionId}` section',
+          taskId: task.idFromBackend ?? task.id,
+          projectId: task.projectId,
+        );
+
         // await fetchActiveTasks(
         //   sectionId: task.sectionId,
         //   projectId: task.projectId,
@@ -210,10 +224,12 @@ class TaskCubit extends Cubit<TaskState> {
         emit(TaskReopened(task));
         task.isCompleted = false;
         await SyncMiddleware().syncLocalWithRemoteTasks([task]);
-        // await fetchActiveTasks(
-        //   sectionId: task.sectionId,
-        //   projectId: task.projectId,
-        // ); // Re-fetch tasks to update the list
+        await ActivityService().logActivity(
+          description:
+              'Task `${task.content}` Re-Opened in `${task.sectionId}` section',
+          taskId: task.idFromBackend ?? task.id,
+          projectId: task.projectId,
+        );
       } else {
         emit(const TaskError('Failed to reopen task.'));
       }
@@ -287,6 +303,13 @@ class TaskCubit extends Cubit<TaskState> {
       await SyncMiddleware().syncLocalWithRemoteTasks([taskModel]);
     }
 
+    // Log the activity of moving the task
+    await ActivityService().logActivity(
+      description: 'Task moved from ${fromSection.name} to ${toSection.name}',
+      taskId: task.idFromBackend ?? task.id,
+      projectId: task.projectId,
+    );
+
     // now fetch the tasks again
     // await fetchActiveTasks(
     //   sectionId: fromSection.id,
@@ -302,14 +325,26 @@ class TaskCubit extends Cubit<TaskState> {
 
   void showAddTaskDialog(
     BuildContext context,
-    String sectionId,
-    String projectId,
-  ) {
+    String? sectionId,
+    String? projectId, {
+    bool isEdit = false,
+    TaskModel? task,
+  }) {
     final contentController = TextEditingController();
     final descriptionController = TextEditingController();
     final dueStringController = TextEditingController();
     final dueLangController = TextEditingController();
     final priorityController = TextEditingController();
+
+    final AppLocalizations appLocalizations = AppLocalizations.of(context);
+
+    if (isEdit) {
+      contentController.text = task?.content ?? '';
+      descriptionController.text = task?.description ?? '';
+      dueStringController.text = task?.due?.dateTime ?? '';
+      // dueLangController.text = task?.due?.lang ?? '';
+      priorityController.text = task?.priority.toString() ?? '';
+    }
 
     showModalBottomSheet<void>(
       context: context,
@@ -476,6 +511,20 @@ class TaskCubit extends Cubit<TaskState> {
                   20.height,
                   ElevatedButton(
                     onPressed: () {
+                      if (isEdit) {
+                        updateTask(
+                          task!,
+                          {
+                            'content': contentController.text,
+                            'dueString': dueStringController.text,
+                            'dueLang': dueLangController.text,
+                            'priority': int.tryParse(priorityController.text),
+                            'description': descriptionController.text,
+                          },
+                        );
+                        Navigator.of(context).pop();
+                        return;
+                      }
                       createTask(
                         content: contentController.text,
                         dueString: dueStringController.text,
@@ -487,7 +536,9 @@ class TaskCubit extends Cubit<TaskState> {
                       );
                       Navigator.of(context).pop();
                     },
-                    child: const Text('Create'),
+                    child: isEdit
+                        ? const Text('Update Task')
+                        : Text(appLocalizations.lblCreateTask),
                   ),
                   10.height,
                 ],

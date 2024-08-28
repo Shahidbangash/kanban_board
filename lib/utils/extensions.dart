@@ -1,6 +1,10 @@
 // Helper method to map the ThemeModeState enum to Flutter's ThemeMode
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kanban_board/cubit/language_cubit.dart';
 import 'package:kanban_board/cubit/theme_cubit.dart';
+import 'package:kanban_board/views/dashboard/views/home_screen.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 ThemeMode mapThemeStateToThemeMode(ThemeModeState themeState) {
   switch (themeState) {
@@ -60,5 +64,15 @@ extension ProjectColorExtension on String {
   Color get toProjectColor {
     return _colorMap[this] ??
         Colors.black; // Default to black if color not found
+  }
+}
+
+// extension on DateTime
+extension DateTimeExtension on DateTime? {
+  String timeAgo(BuildContext context) {
+    return timeago.format(
+      this ?? DateTime.now(),
+      locale: context.read<LanguageCubit>().state.languageCode,
+    );
   }
 }
