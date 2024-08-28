@@ -82,13 +82,20 @@ class TaskComponent extends StatelessWidget {
                   itemBuilder: (context) {
                     return [
                       PopupMenuItem<void>(
-                        child: const Text('Edit'),
+                        child: const Text('Edit Task'),
                         onTap: () {
                           log('Edit task');
+                          TaskCubit(TaskRepository()).showAddTaskDialog(
+                            context,
+                            task.sectionId,
+                            task.projectId,
+                            task: task,
+                            isEdit: true,
+                          );
                         },
                       ),
                       PopupMenuItem<void>(
-                        child: const Text('Delete'),
+                        child: const Text('Delete Task'),
                         onTap: () {
                           log('Delete task');
 

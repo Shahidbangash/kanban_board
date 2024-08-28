@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:kanban_board/models/activity_model.dart';
 import 'package:kanban_board/models/section_model.dart';
 import 'package:kanban_board/models/task_model.dart';
 import 'package:kanban_board/repositories/task_repository.dart';
@@ -158,11 +159,17 @@ class TaskCubit extends Cubit<TaskState> {
       }
 
       if (task != null) {
-        emit(TaskUpdated(task));
-        await fetchActiveTasks(
-          sectionId: task.sectionId,
+        await ActivityService().logActivity(
+          description: 'Task `${task.content}` Updated',
+          taskId: task.idFromBackend ?? task.id,
           projectId: task.projectId,
-        ); // Re-fetch tasks to update the list
+        );
+
+        emit(TaskUpdated(task));
+        // await fetchActiveTasks(
+        //   sectionId: task.sectionId,
+        //   projectId: task.projectId,
+        // ); // Re-fetch tasks to update the list
       } else {
         emit(const TaskError('Failed to update task.'));
       }
@@ -317,14 +324,24 @@ class TaskCubit extends Cubit<TaskState> {
 
   void showAddTaskDialog(
     BuildContext context,
-    String sectionId,
-    String projectId,
-  ) {
+    String? sectionId,
+    String? projectId, {
+    bool isEdit = false,
+    TaskModel? task,
+  }) {
     final contentController = TextEditingController();
     final descriptionController = TextEditingController();
     final dueStringController = TextEditingController();
     final dueLangController = TextEditingController();
     final priorityController = TextEditingController();
+
+    if (isEdit) {
+      contentController.text = task?.content ?? '';
+      descriptionController.text = task?.description ?? '';
+      dueStringController.text = task?.due?.dateTime ?? '';
+      // dueLangController.text = task?.due?.lang ?? '';
+      priorityController.text = task?.priority.toString() ?? '';
+    }
 
     showModalBottomSheet<void>(
       context: context,
@@ -491,6 +508,20 @@ class TaskCubit extends Cubit<TaskState> {
                   20.height,
                   ElevatedButton(
                     onPressed: () {
+                      if (isEdit) {
+                        updateTask(
+                          task!,
+                          {
+                            'content': contentController.text,
+                            'dueString': dueStringController.text,
+                            'dueLang': dueLangController.text,
+                            'priority': int.tryParse(priorityController.text),
+                            'description': descriptionController.text,
+                          },
+                        );
+                        Navigator.of(context).pop();
+                        return;
+                      }
                       createTask(
                         content: contentController.text,
                         dueString: dueStringController.text,
@@ -502,7 +533,9 @@ class TaskCubit extends Cubit<TaskState> {
                       );
                       Navigator.of(context).pop();
                     },
-                    child: const Text('Create'),
+                    child: isEdit
+                        ? const Text('Update Task')
+                        : const Text('Create Task'),
                   ),
                   10.height,
                 ],
