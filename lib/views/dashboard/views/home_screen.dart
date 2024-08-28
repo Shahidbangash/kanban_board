@@ -49,39 +49,44 @@ class _HomeScreenState extends State<HomeScreen> {
         child: const Icon(Icons.track_changes),
       ),
       // endDrawer: const EndDrawerButton(),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          children: [
-            StreamBuilder<List<Project>>(
-              stream: isar.projects.where().watch(fireImmediately: true),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else if (snapshot.hasData) {
-                  final projects = snapshot.data!;
-                  if (projects.isEmpty) {
-                    return const Center(child: Text('No Projects Available'));
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await SyncMiddleware(isar: isar).syncProjects();
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            children: [
+              StreamBuilder<List<Project>>(
+                stream: isar.projects.where().watch(fireImmediately: true),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else if (snapshot.hasData) {
+                    final projects = snapshot.data!;
+                    if (projects.isEmpty) {
+                      return const Center(child: Text('No Projects Available'));
+                    }
+                    return Expanded(
+                      child: ListView.builder(
+                        itemCount: projects.length,
+                        itemBuilder: (context, index) {
+                          final project = projects[index];
+                          return Container(
+                            margin: const EdgeInsets.symmetric(vertical: 10),
+                            child: ProjectComponent(project: project),
+                          );
+                        },
+                      ),
+                    );
                   }
-                  return Expanded(
-                    child: ListView.builder(
-                      itemCount: projects.length,
-                      itemBuilder: (context, index) {
-                        final project = projects[index];
-                        return Container(
-                          margin: const EdgeInsets.symmetric(vertical: 10),
-                          child: ProjectComponent(project: project),
-                        );
-                      },
-                    ),
-                  );
-                }
-                return const Center(child: Text('No data'));
-              },
-            ),
-          ],
+                  return const Center(child: Text('No data'));
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

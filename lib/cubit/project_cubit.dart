@@ -6,6 +6,8 @@ import 'package:kanban_board/cubit/task_cubit.dart';
 import 'package:kanban_board/models/project_model.dart';
 import 'package:kanban_board/repositories/project_repository.dart';
 import 'package:kanban_board/utils/extensions.dart';
+import 'package:kanban_board/utils/isar.dart';
+import 'package:kanban_board/utils/middleware.dart';
 
 // States for TaskCubit
 abstract class ProjectState extends Equatable {
@@ -55,6 +57,14 @@ class ProjectCubit extends Cubit<ProjectState> {
 
       // Call the repository to create the project
       final projectData = await projectRepository.createProject(projectName);
+
+      if (projectData != null) {
+        // sync it with the local database
+        await SyncMiddleware(isar: IsarService().isarInstance)
+            .syncLocalWithRemoteProjects(
+          [projectData],
+        );
+      }
 
       // Emit the created state with the project data
       emit(ProjectCreated(projectData));

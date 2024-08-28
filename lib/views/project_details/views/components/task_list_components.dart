@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:isar/isar.dart';
 import 'package:kanban_board/cubit/section_cubit.dart';
 import 'package:kanban_board/cubit/task_cubit.dart';
 import 'package:kanban_board/models/project_model.dart';
 import 'package:kanban_board/models/section_model.dart';
 import 'package:kanban_board/models/task_model.dart';
 import 'package:kanban_board/repositories/task_repository.dart';
+import 'package:kanban_board/utils/isar.dart';
+import 'package:kanban_board/utils/middleware.dart';
 import 'package:kanban_board/views/project_details/views/components/task_component.dart';
 
 class TaskListComponent extends StatelessWidget {
@@ -73,8 +76,8 @@ class TaskListComponent extends StatelessWidget {
                   //  context.read<TaskCubit>().showAddTaskDialog(context, sectionId, projectId)
                   taskCubit.showAddTaskDialog(
                     context,
-                    section.id!,
-                    project.id!,
+                    section.idFromBackend ?? section.id,
+                    project.idFromBackend ?? project.id,
                   );
                 },
                 padding: const EdgeInsets.all(4),
@@ -92,8 +95,8 @@ class TaskListComponent extends StatelessWidget {
                   if (value == 'delete') {
                     // Trigger the deletion of the section using SectionCubit
                     context.read<SectionCubit>().deleteSection(
-                          section.id!,
-                          project.id!,
+                          section.idFromBackend ?? section.id,
+                          project.idFromBackend ?? project.id,
                         );
                   }
                 },
@@ -110,51 +113,152 @@ class TaskListComponent extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          Expanded(
-            child: BlocProvider(
-              create: (context) {
-                return taskCubit
-                  ..fetchActiveTasks(
-                    sectionId: section.id,
-                    projectId: project.id,
-                  );
-              },
-              child: BlocConsumer<TaskCubit, TaskState>(
-                listener: (context, state) {
-                  if (state is TaskError) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(state.error),
-                      ),
-                    );
-                  }
+          // Expanded(
+          //   child: BlocProvider(
+          //     create: (context) {
+          //       return taskCubit
+          //         ..fetchActiveTasks(
+          //           sectionId: section.id,
+          //           projectId: project.id,
+          //         );
+          //     },
+          //     child: BlocConsumer<TaskCubit, TaskState>(
+          //       listener: (context, state) {
+          //         if (state is TaskError) {
+          //           ScaffoldMessenger.of(context).showSnackBar(
+          //             SnackBar(
+          //               content: Text(state.error),
+          //             ),
+          //           );
+          //         }
 
-                  if (state is TaskCreated) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Task added successfully'),
+          //         if (state is TaskCreated) {
+          //           ScaffoldMessenger.of(context).showSnackBar(
+          //             const SnackBar(
+          //               content: Text('Task added successfully'),
+          //             ),
+          //           );
+          //         }
+          //       },
+          //       buildWhen: (_, state) => state is! TaskCreated,
+          //       builder: (context, state) {
+          //         if (state is TaskLoading) {
+          //           return const Center(child: CircularProgressIndicator());
+          //         } else if (state is TaskLoaded) {
+          //           final tasks = state.tasks;
+          //           return DragTarget<(TaskModel, SectionModel, SectionModel)>(
+          //             onAcceptWithDetails: (
+          //               DragTargetDetails<
+          //                       (TaskModel, SectionModel, SectionModel)>
+          //                   details,
+          //             ) {
+          //               // final receivedTask = details.data;
+          //               onCardMoved(
+          //                 task: details.data.$1,
+          //                 fromSection: details.data.$3,
+          //                 toSection: section,
+          //                 taskCubit: taskCubit,
+          //               );
+          //             },
+          //             builder: (
+          //               BuildContext context,
+          //               List<(TaskModel, SectionModel, SectionModel)?>
+          //                   candidateData,
+          //               rejectedData,
+          //             ) {
+          //               return ReorderableListView.builder(
+          //                 primary: true,
+          //                 onReorder: (oldIndex, newIndex) {
+          //                   // if (tasks == null) {
+          //                   //   return;
+          //                   // }
+
+          //                   // final taskToMove = tasks.removeAt(oldIndex);
+          //                   // tasks.insert(newIndex, taskToMove);
+          //                 },
+          //                 itemCount: tasks?.length ?? 0,
+          //                 itemBuilder: (context, index) {
+          //                   final task = state.tasks?[index];
+
+          //                   if (task == null) {
+          //                     return const SizedBox.shrink();
+          //                   }
+
+          //                   return Draggable<
+          //                       (TaskModel, SectionModel, SectionModel)>(
+          //                     key: Key(task.id.toString()),
+          //                     data: (task, section, section),
+          //                     feedback: Material(
+          //                       child: Container(
+          //                         padding: const EdgeInsets.all(8),
+          //                         color: Colors.blue,
+          //                         child: Text(
+          //                           task.content ?? '',
+          //                           style: const TextStyle(color: Colors.white),
+          //                         ),
+          //                       ),
+          //                     ),
+          //                     childWhenDragging: const SizedBox.shrink(),
+          //                     child: Padding(
+          //                       padding: const EdgeInsets.only(bottom: 16),
+          //                       child: TaskComponent(
+          //                         task: task,
+          //                       ),
+          //                     ),
+          //                   );
+          //                 },
+          //               );
+          //             },
+          //           );
+          //         } else if (state is TaskError) {
+          //           return Center(child: Text('Error: ${state.error}'));
+          //         }
+          //         return Container();
+          //       },
+          //     ),
+          //   ),
+          // ),
+
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: () async {
+                await SyncMiddleware(isar: IsarService().isarInstance)
+                    .syncSections(project.idFromBackend ?? project.id);
+              },
+              child: StreamBuilder<List<TaskModel>>(
+                stream: IsarService()
+                    .isarInstance
+                    .taskModels
+                    // .where()
+                    .where()
+                    .sectionIdEqualTo(section.id) // Filter by section ID
+                    .projectIdEqualTo(project.id) // Filter by project ID
+                    .watch(fireImmediately: true),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(
+                      child: Text(
+                        'No tasks found for this section',
+                        style: Theme.of(context).textTheme.titleSmall,
                       ),
                     );
-                  }
-                },
-                buildWhen: (_, state) => state is! TaskCreated,
-                builder: (context, state) {
-                  if (state is TaskLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (state is TaskLoaded) {
-                    final tasks = state.tasks;
+                  } else {
+                    final tasks = snapshot.data!;
                     return DragTarget<(TaskModel, SectionModel, SectionModel)>(
                       onAcceptWithDetails: (
                         DragTargetDetails<
                                 (TaskModel, SectionModel, SectionModel)>
                             details,
                       ) {
-                        // final receivedTask = details.data;
                         onCardMoved(
+                          taskCubit: taskCubit,
                           task: details.data.$1,
                           fromSection: details.data.$3,
                           toSection: section,
-                          taskCubit: taskCubit,
                         );
                       },
                       builder: (
@@ -166,24 +270,22 @@ class TaskListComponent extends StatelessWidget {
                         return ReorderableListView.builder(
                           primary: true,
                           onReorder: (oldIndex, newIndex) {
-                            // if (tasks == null) {
-                            //   return;
-                            // }
+                            // setState(() {
+                            //   final taskToMove = tasks.removeAt(oldIndex);
+                            //   tasks.insert(newIndex, taskToMove);
 
-                            // final taskToMove = tasks.removeAt(oldIndex);
-                            // tasks.insert(newIndex, taskToMove);
+                            //   isar.writeTxnSync(() {
+                            //     isar.taskModels.putAll(tasks);
+                            //   });
+                            // });
                           },
-                          itemCount: tasks?.length ?? 0,
+                          itemCount: tasks.length,
                           itemBuilder: (context, index) {
-                            final task = state.tasks?[index];
-
-                            if (task == null) {
-                              return const SizedBox.shrink();
-                            }
+                            final task = tasks[index];
 
                             return Draggable<
                                 (TaskModel, SectionModel, SectionModel)>(
-                              key: Key(task.id.toString()),
+                              key: Key(task.idFromBackend ?? task.id),
                               data: (task, section, section),
                               feedback: Material(
                                 child: Container(
@@ -198,19 +300,14 @@ class TaskListComponent extends StatelessWidget {
                               childWhenDragging: const SizedBox.shrink(),
                               child: Padding(
                                 padding: const EdgeInsets.only(bottom: 16),
-                                child: TaskComponent(
-                                  task: task,
-                                ),
+                                child: TaskComponent(task: task),
                               ),
                             );
                           },
                         );
                       },
                     );
-                  } else if (state is TaskError) {
-                    return Center(child: Text('Error: ${state.error}'));
                   }
-                  return Container();
                 },
               ),
             ),

@@ -18,7 +18,7 @@ class SyncMiddleware {
     // required this.sectionRepository,
     // required this.commentRepository,
   }) {
-    _setupListeners();
+    // _setupListeners();
   }
   final Isar isar;
   final ProjectRepository _projectRepository = ProjectRepository();
@@ -26,15 +26,15 @@ class SyncMiddleware {
   final SectionRepository _sectionRepository = SectionRepository();
   final CommentRepository _commentRepository = CommentRepository();
 
-  Future<void> _setupListeners() async {
+  Future<void> setupListeners() async {
     // Listen for changes in the Project collection
     if (isar.projects.count() > 0) {
       isar.projects.watchLazy().listen((_) async {
-        await _syncProjects();
+        await syncProjects();
       });
     } else {
       // isar.projects.watchLazy().listen((_) async {
-      await _syncProjects();
+      await syncProjects();
       // });
     }
 
@@ -44,14 +44,14 @@ class SyncMiddleware {
         // get the project ID
         final projects = isar.projects.where().findAll();
         for (final project in projects) {
-          await _syncSections(project.idFromBackend ?? project.id);
+          await syncSections(project.idFromBackend ?? project.id);
         }
         // await _syncSections();
       });
     } else {
       final projects = isar.projects.where().findAll();
       for (final project in projects) {
-        await _syncSections(project.idFromBackend ?? project.id);
+        await syncSections(project.idFromBackend ?? project.id);
       }
     }
 
@@ -64,25 +64,29 @@ class SyncMiddleware {
       await _syncTasks();
     }
 
-    // Listen for changes in the Comment collection
-    isar.comments.watchLazy().listen((_) async {
-      await _syncComments();
-    });
+    if (isar.comments.count() > 0) {
+      // Listen for changes in the Comment collection
+      isar.comments.watchLazy().listen((_) async {
+        await syncComments();
+      });
+    } else {
+      await syncComments();
+    }
   }
 
-  Future<void> _syncProjects() async {
+  Future<void> syncProjects() async {
     // Fetch all local projects
-    final localProjects = isar.projects.where().findAll();
+    // final localProjects = isar.projects.where().findAll();
 
-    for (final project in localProjects) {
-      // Existing project, update it on the backend
-      await _projectRepository.updateProject(project);
-    }
+    // for (final project in localProjects) {
+    //   // Existing project, update it on the backend
+    //   await _projectRepository.updateProject(project);
+    // }
 
     // Optionally, you can also fetch projects from the API and update the local database.
     final remoteProjects = await _projectRepository.getAllProjects();
     if (remoteProjects != null) {
-      await _syncLocalWithRemoteProjects(remoteProjects);
+      await syncLocalWithRemoteProjects(remoteProjects);
     }
     // await _syncLocalWithRemoteProjects(remoteProjects );
   }
@@ -98,23 +102,23 @@ class SyncMiddleware {
     // Optionally, fetch remote tasks and sync locally
     final remoteTasks = await _taskRepository.getActiveTasks();
     if (remoteTasks != null) {
-      await _syncLocalWithRemoteTasks(remoteTasks);
+      await syncLocalWithRemoteTasks(remoteTasks);
     }
     // await _syncLocalWithRemoteTasks(remoteTasks!.map((e) => e.toJson()).toList());
   }
 
-  Future<void> _syncSections(String projectId) async {
-    final localSections = isar.sectionModels.where().findAll();
+  Future<void> syncSections(String projectId) async {
+    // final localSections = isar.sectionModels.where().findAll();
 
-    for (final section in localSections) {
-      // Existing section, update it on the backend
-      if (section.idFromBackend != null) {
-        await _sectionRepository.updateSection(
-          section.idFromBackend!,
-          '${section.name}',
-        );
-      }
-    }
+    // for (final section in localSections) {
+    //   // Existing section, update it on the backend
+    //   if (section.idFromBackend != null) {
+    //     await _sectionRepository.updateSection(
+    //       section.idFromBackend!,
+    //       '${section.name}',
+    //     );
+    //   }
+    // }
 
     // Optionally, fetch remote sections and sync locally
     final remoteSections =
@@ -125,16 +129,16 @@ class SyncMiddleware {
     }
   }
 
-  Future<void> _syncComments() async {
-    final localComments = isar.comments.where().findAll();
+  Future<void> syncComments() async {
+    // final localComments = isar.comments.where().findAll();
 
-    for (final comment in localComments) {
-      // Existing comment, update it on the backend
-      await _commentRepository.updateComment(
-        comment.idFromBackend ?? comment.id,
-        comment.toJson(),
-      );
-    }
+    // for (final comment in localComments) {
+    //   // Existing comment, update it on the backend
+    //   await _commentRepository.updateComment(
+    //     comment.idFromBackend ?? comment.id,
+    //     comment.toJson(),
+    //   );
+    // }
 
     // get the task ID
     final tasks = isar.taskModels.where().findAll();
@@ -151,8 +155,7 @@ class SyncMiddleware {
     }
   }
 
-  Future<void> _syncLocalWithRemoteProjects(
-      List<Project> remoteProjects) async {
+  Future<void> syncLocalWithRemoteProjects(List<Project> remoteProjects) async {
     // Logic to update the local database with remote projects
 
     await isar.write((isar) async {
@@ -160,7 +163,7 @@ class SyncMiddleware {
     });
   }
 
-  Future<void> _syncLocalWithRemoteTasks(List<TaskModel> remoteTasks) async {
+  Future<void> syncLocalWithRemoteTasks(List<TaskModel> remoteTasks) async {
     await isar.write((isar) async {
       isar.taskModels.putAll(remoteTasks);
     });
@@ -177,6 +180,12 @@ class SyncMiddleware {
       List<Comment> remoteComments) async {
     await isar.write((isar) async {
       isar.comments.putAll(remoteComments);
+    });
+  }
+
+  Future<void> deleteTask(String taskId) async {
+    await isar.write((isar) async {
+      isar.taskModels.delete(taskId);
     });
   }
 }

@@ -7,6 +7,8 @@ import 'package:kanban_board/models/section_model.dart';
 import 'package:kanban_board/models/task_model.dart';
 import 'package:kanban_board/repositories/task_repository.dart';
 import 'package:kanban_board/utils/extensions.dart';
+import 'package:kanban_board/utils/isar.dart';
+import 'package:kanban_board/utils/middleware.dart';
 
 // Task States
 abstract class TaskState extends Equatable {
@@ -129,10 +131,12 @@ class TaskCubit extends Cubit<TaskState> {
 
       if (task != null) {
         // emit(TaskCreated(task));
-        await fetchActiveTasks(
-          projectId: task.projectId,
-          sectionId: task.sectionId,
-        ); // Re-fetch tasks to update the list
+        await SyncMiddleware(isar: IsarService().isarInstance)
+            .syncLocalWithRemoteTasks([task]);
+        // await fetchActiveTasks(
+        //   projectId: task.projectId,
+        //   sectionId: task.sectionId,
+        // ); // Re-fetch tasks to update the list
       } else {
         emit(const TaskError('Failed to create task.'));
       }
@@ -213,7 +217,10 @@ class TaskCubit extends Cubit<TaskState> {
     try {
       emit(TaskLoading());
 
-      final success = await taskRepository.deleteTask(task.id!);
+      await SyncMiddleware(isar: IsarService().isarInstance)
+          .deleteTask(task.id);
+      final success =
+          await taskRepository.deleteTask(task.idFromBackend ?? task.id);
 
       if (success) {
         emit(TaskDeleted(task));
@@ -241,7 +248,18 @@ class TaskCubit extends Cubit<TaskState> {
     if (fromSection.id == toSection.id) {
       return;
     }
-    await createTask(
+    // await createTask(
+    //   content: task.content ?? '',
+    //   dueString: task.due?.dateTime,
+    //   // dueLang: task.lan,
+    //   description: task.description,
+    //   sectionId: toSection.id,
+    //   projectId: toSection.projectId,
+    //   priority: task.priority,
+    //   // dueLang: task.due?.lang,
+    // );
+
+    final taskModel = await taskRepository.createTask(
       content: task.content ?? '',
       dueString: task.due?.dateTime,
       // dueLang: task.lan,
@@ -253,11 +271,20 @@ class TaskCubit extends Cubit<TaskState> {
     );
     // ----- Once Created then delete the task from the original section -----
     await deleteTask(task);
+
+    await SyncMiddleware(isar: IsarService().isarInstance)
+        .deleteTask(task.idFromBackend ?? task.id);
+
+    if (taskModel != null) {
+      await SyncMiddleware(isar: IsarService().isarInstance)
+          .syncLocalWithRemoteTasks([taskModel]);
+    }
+
     // now fetch the tasks again
-    await fetchActiveTasks(
-      sectionId: fromSection.id,
-      projectId: fromSection.projectId,
-    );
+    // await fetchActiveTasks(
+    //   sectionId: fromSection.id,
+    //   projectId: fromSection.projectId,
+    // );
 
     // await fetchActiveTasks(
     //   sectionId: toSection.id,

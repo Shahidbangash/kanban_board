@@ -1,6 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kanban_board/cubit/task_cubit.dart';
 import 'package:kanban_board/models/task_model.dart';
+import 'package:kanban_board/repositories/task_repository.dart';
 import 'package:kanban_board/views/task_details/views/task_details_screen.dart';
 
 class TaskComponent extends StatelessWidget {
@@ -58,11 +63,26 @@ class TaskComponent extends StatelessWidget {
                     ),
                   ),
                 ),
-                MaterialButton(
-                  onPressed: () {
-                    // Trigger the creation of a new task using TaskCubit
+                PopupMenuButton(
+                  icon: const Icon(Icons.more_vert),
+                  itemBuilder: (context) {
+                    return [
+                      PopupMenuItem(
+                        child: const Text('Edit'),
+                        onTap: () {
+                          log('Edit task');
+                        },
+                      ),
+                      PopupMenuItem(
+                        child: const Text('Delete'),
+                        onTap: () {
+                          log('Delete task');
+
+                          TaskCubit(TaskRepository()).deleteTask(task);
+                        },
+                      ),
+                    ];
                   },
-                  child: const Icon(Icons.add),
                 ),
               ],
             ),

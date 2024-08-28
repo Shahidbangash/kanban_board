@@ -30,7 +30,7 @@ class ProjectComponent extends StatelessWidget {
           MaterialPageRoute<Widget>(
             builder: (BuildContext context) {
               return ProjectDetailsScreen(
-                projectId: project.id!,
+                projectId: project.idFromBackend ?? project.id,
                 project: project,
               );
             },
