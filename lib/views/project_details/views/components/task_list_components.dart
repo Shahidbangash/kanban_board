@@ -104,9 +104,9 @@ class TaskListComponent extends StatelessWidget {
                 icon: const Icon(Icons.more_vert),
                 itemBuilder: (context) {
                   return [
-                    const PopupMenuItem(
+                    PopupMenuItem(
                       value: 'delete',
-                      child: Text('Delete Section'),
+                      child: Text(appLocalizations.lblDeleteTask),
                     ),
                   ];
                 },

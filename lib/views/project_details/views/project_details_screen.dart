@@ -139,6 +139,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var appLocalizations = context.l10n;
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -150,7 +151,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
         child: const Icon(Icons.add),
       ),
       appBar: AppBar(
-        title: const Text('Project Sections'),
+        title: Text(appLocalizations.lblProjectSections),
         actions: [
           IconButton(
             onPressed: () async {
@@ -184,21 +185,25 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return InkWell(
-                    onTap: () => sectionCubit.showAddSectionUi(
-                      context,
-                      project: widget.project,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(R.ASSETS_NO_TASK_ICON_PNG),
-                        const SizedBox(height: 20),
-                        Text(
-                          'No sections found for this project',
-                          style: Theme.of(context).textTheme.titleSmall,
-                        ),
-                      ],
+                  return Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: InkWell(
+                      onTap: () => sectionCubit.showAddSectionUi(
+                        context,
+                        project: widget.project,
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Image.asset(R.ASSETS_NO_TASK_ICON_PNG),
+                          const SizedBox(height: 20),
+                          Text(
+                            appLocalizations.lblNoSectionsFound,
+                            // 'No sections found for this project',
+                            style: Theme.of(context).textTheme.titleSmall,
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 } else {
@@ -288,9 +293,9 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
             icon: const Icon(Icons.more_vert),
             itemBuilder: (context) {
               return [
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'delete',
-                  child: Text('Delete Section'),
+                  child: Text(appLocalizations.lblDeleteTask),
                 ),
               ];
             },

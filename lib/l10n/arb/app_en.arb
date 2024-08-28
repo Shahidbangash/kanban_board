@@ -13,5 +13,32 @@
     "lblSystem": "System",
     "lblProjects": "Projects",
     "lblAddTask":"Add Task",
-    "lblCreateTask":"Create Task"
+    "lblCreateTask":"Create Task",
+    "lblUpdateTask":"Update Task",
+    "lblEditTask":"Edit Task",
+    "lblDeleteTask":"Delete Task",
+    "lblTask":"Task",
+    "lblEditSection":"Edit Section",
+    "lblEditProject":"Edit Project",
+    "lblAddSection":"Add Section",
+    "lblTo":"to",
+    "lblSectionName":"Section Name",
+    "lblPleaseEnterSectionName": "Please enter section name",
+    "lblActivityHistory": "Activity History",
+    "lblComments": "Comments",
+    "lblNoComments":"No comments",
+    "lblPostedAt":"Posted at",
+    "lblIsCompleted":"Is Completed",
+    "lblCreateNewProject": "Create New Project",
+    "lblProjectSections": "Project Sections",
+    "lblEnterTaskContent" : "Enter task content",
+    "lblEnterTaskDescription" : "Enter task description",
+    "lblOptional": "Optional",
+    "lblPriority": "Priority",
+    "lblSelectDueDate": "Select Due Date",
+    "lblEnterProjectName": "Enter Project Name",
+    "lblCreateProject" : "Create Project",
+    "lblNoSectionsFound": "No Sections Found"
+
+
 }

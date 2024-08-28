@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:kanban_board/cubit/section_cubit.dart';
+import 'package:kanban_board/l10n/l10n.dart';
 import 'package:kanban_board/models/project_model.dart';
 
 class AddSectionForm extends StatelessWidget {
@@ -17,6 +18,7 @@ class AddSectionForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appLocalizations = AppLocalizations.of(context);
     return Form(
       key: _formKey,
       child: Padding(
@@ -27,7 +29,7 @@ class AddSectionForm extends StatelessWidget {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Add Section to ${project.name}',
+                '${appLocalizations.lblAddSection} ${appLocalizations.lblTo} ${project.name}',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
@@ -35,14 +37,14 @@ class AddSectionForm extends StatelessWidget {
             TextFormField(
               controller: _sectionNameController,
               decoration: InputDecoration(
-                hintText: 'Section Name',
+                hintText: appLocalizations.lblSectionName,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter a section name';
+                  return appLocalizations.lblPleaseEnterSectionName;
                 }
                 return null;
               },
@@ -63,7 +65,7 @@ class AddSectionForm extends StatelessWidget {
 
                 Navigator.pop(context);
               },
-              child: const Text('Add Section'),
+              child: Text(appLocalizations.lblAddSection),
             ),
           ],
         ),

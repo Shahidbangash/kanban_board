@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:isar/isar.dart';
 import 'package:kanban_board/components/task_timer_widget.dart';
 import 'package:kanban_board/cubit/comment_cubit.dart';
+import 'package:kanban_board/l10n/l10n.dart';
 import 'package:kanban_board/models/task_comment_model.dart';
 import 'package:kanban_board/models/task_model.dart';
 import 'package:kanban_board/repositories/comments_repository.dart';
@@ -18,6 +19,7 @@ class TaskDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final contentController = TextEditingController();
+    final AppLocalizations appLocalizations = AppLocalizations.of(context);
     final commentCubit = CommentCubit(
       CommentRepository(),
     )..fetchComments(task.idFromBackend ?? task.id);
@@ -63,8 +65,8 @@ class TaskDetailsScreen extends StatelessWidget {
                         ),
                         10.height,
                         CommonKeyValueRowWidget(
-                          title: 'Is Completed',
-                          value: task.projectId ?? 'No content',
+                          title: appLocalizations.lblIsCompleted,
+                          value: task.isCompleted ?? false ? '✅' : '❌',
                         ),
                         10.height,
                         CommonKeyValueRowWidget(
@@ -108,7 +110,8 @@ class TaskDetailsScreen extends StatelessWidget {
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Text(
-                            'Comments',
+                            appLocalizations.lblComments,
+                            // 'Comments',
                             style: Theme.of(context)
                                 .textTheme
                                 .displayMedium
@@ -132,8 +135,8 @@ class TaskDetailsScreen extends StatelessWidget {
                               );
                             } else if (!snapshot.hasData ||
                                 (snapshot.data?.isEmpty ?? false)) {
-                              return const Center(
-                                child: Text('No comments'),
+                              return Center(
+                                child: Text(appLocalizations.lblNoComments),
                               );
                             } else {
                               final comments = snapshot.data!;
@@ -177,7 +180,7 @@ class TaskDetailsScreen extends StatelessWidget {
                                             ),
                                       ),
                                       subtitle: Text(
-                                        'Posted at: ${DateFormat('M/d/y').format(comment.postedAt ?? DateTime.now())} (${comment.postedAt?.timeAgo(context)})',
+                                        '${appLocalizations.lblPostedAt}: ${DateFormat('M/d/y').format(comment.postedAt ?? DateTime.now())} (${comment.postedAt?.timeAgo(context)})',
                                         style: Theme.of(context)
                                             .textTheme
                                             .bodyMedium
