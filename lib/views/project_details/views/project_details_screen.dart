@@ -1,10 +1,13 @@
 import 'dart:developer';
 import 'package:appflowy_board/appflowy_board.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:isar/isar.dart';
+import 'package:kanban_board/app/view/app.dart';
 import 'package:kanban_board/const/resource.dart';
 import 'package:kanban_board/cubit/section_cubit.dart';
 import 'package:kanban_board/cubit/task_cubit.dart';
+import 'package:kanban_board/cubit/theme_cubit.dart';
 import 'package:kanban_board/models/project_model.dart';
 import 'package:kanban_board/models/section_model.dart';
 import 'package:kanban_board/models/task_model.dart';
@@ -220,8 +223,10 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
   }
 
   Widget _buildAppFlowyBoard() {
-    const config = AppFlowyBoardConfig(
-      groupBackgroundColor: Color(0xFFE0E7FF),
+    var config = AppFlowyBoardConfig(
+      groupBackgroundColor: context.read<ThemeCubit>().isLightTheme
+          ? const Color(0xFFE0E7FF)
+          : const Color(0xFF1E293B),
       boardCornerRadius: 14,
     );
     return AppFlowyBoard(
