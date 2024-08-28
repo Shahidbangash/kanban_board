@@ -10,5 +10,6 @@
     "lblTheme": "Theme",
     "lblDark": "Dark",
     "lblLight": "Light",
-    "lblSystem": "System"
+    "lblSystem": "System",
+    "lblProjects": "Projects"
 }

@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:kanban_board/cubit/task_cubit.dart';
 import 'package:kanban_board/models/task_model.dart';
 import 'package:kanban_board/repositories/task_repository.dart';
-import 'package:kanban_board/views/history/view/activity_history_screen.dart';
 import 'package:kanban_board/views/task_details/views/task_details_screen.dart';
 
 class TaskComponent extends StatelessWidget {

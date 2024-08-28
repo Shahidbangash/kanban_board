@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:kanban_board/views/history/view/activity_history_widget.dart';
 
 class ActivityHistoryScreen extends StatefulWidget {

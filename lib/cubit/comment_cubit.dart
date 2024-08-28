@@ -1,7 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:kanban_board/models/task_comment_model.dart';
-import 'package:kanban_board/models/task_model.dart';
 import 'package:kanban_board/repositories/comments_repository.dart';
 import 'package:kanban_board/utils/activity_services.dart';
 import 'package:kanban_board/utils/middleware.dart';

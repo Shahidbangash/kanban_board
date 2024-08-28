@@ -19,16 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   TextEditingController projectNameController = TextEditingController();
   Isar isar = IsarService().isarInstance;
 
-  @override
-  void initState() {
-    super.initState();
-    // isar = IsarService().isarInstance;
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // SyncMiddleware(isar: isar);
-      // Trigger fetching all projects using TaskCubit
-      // context.read<ProjectCubit>().fetchAllProjects();
-    });
-  }
+  bool isListView = true;
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +43,30 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      '${appLocalizations.lblProjects} 📂  (${isar.projects.count()})',
+                      style: Theme.of(context).textTheme.headlineMedium,
+                    ),
+                  ),
+
+                  // Toggle Project List View or Grid View
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        isListView = !isListView;
+                      });
+                      // context.read<ProjectCubit>().toggleProjectView();
+                    },
+                    icon: Icon(isListView ? Icons.grid_view : Icons.list),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
               StreamBuilder<List<Project>>(
                 stream: isar.projects.where().watch(fireImmediately: true),
                 builder: (context, snapshot) {
@@ -66,16 +80,31 @@ class _HomeScreenState extends State<HomeScreen> {
                       return const Center(child: Text('No Projects Available'));
                     }
                     return Expanded(
-                      child: ListView.builder(
-                        itemCount: projects.length,
-                        itemBuilder: (context, index) {
-                          final project = projects[index];
-                          return Container(
-                            margin: const EdgeInsets.symmetric(vertical: 10),
-                            child: ProjectComponent(project: project),
-                          );
-                        },
-                      ),
+                      child: isListView
+                          ? ListView.builder(
+                              itemCount: projects.length,
+                              itemBuilder: (context, index) {
+                                final project = projects[index];
+                                return Container(
+                                  margin:
+                                      const EdgeInsets.symmetric(vertical: 10),
+                                  child: ProjectComponent(project: project),
+                                );
+                              },
+                            )
+                          : GridView.builder(
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 10,
+                              ),
+                              itemCount: projects.length,
+                              itemBuilder: (context, index) {
+                                final project = projects[index];
+                                return ProjectComponent(project: project);
+                              },
+                            ),
                     );
                   }
                   return const Center(child: Text('No data'));
