@@ -11,5 +11,6 @@
     "lblDark": "Dark",
     "lblLight": "Light",
     "lblSystem": "System",
-    "lblProjects": "Projects"
+    "lblProjects": "Projects",
+    "lblAddTask":"Add Task"
 }

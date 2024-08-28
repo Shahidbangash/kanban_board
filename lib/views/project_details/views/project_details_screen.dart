@@ -8,6 +8,7 @@ import 'package:kanban_board/const/resource.dart';
 import 'package:kanban_board/cubit/section_cubit.dart';
 import 'package:kanban_board/cubit/task_cubit.dart';
 import 'package:kanban_board/cubit/theme_cubit.dart';
+import 'package:kanban_board/l10n/l10n.dart';
 import 'package:kanban_board/models/project_model.dart';
 import 'package:kanban_board/models/section_model.dart';
 import 'package:kanban_board/models/task_model.dart';
@@ -223,6 +224,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
   }
 
   Widget _buildAppFlowyBoard() {
+    final AppLocalizations appLocalizations = context.l10n;
     var config = AppFlowyBoardConfig(
       groupBackgroundColor: context.read<ThemeCubit>().isLightTheme
           ? const Color(0xFFE0E7FF)
@@ -303,7 +305,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
       footerBuilder: (context, columnData) {
         return AppFlowyGroupFooter(
           icon: const Icon(Icons.add, size: 20),
-          title: const Text('Add Task'),
+          title: Text(appLocalizations.lblAddTask),
           height: 50,
           margin: const EdgeInsets.all(8),
           onAddButtonClick: () {

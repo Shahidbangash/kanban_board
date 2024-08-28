@@ -11,6 +11,7 @@
     "lblDark": "Dunkel",
     "lblLight": "Licht",
     "lblSystem": "System",
-    "lblProjects": "Projekte"
+    "lblProjects": "Projekte",
+    "lblAddTask":"Aufgabe hinzufügen"
     
 }
