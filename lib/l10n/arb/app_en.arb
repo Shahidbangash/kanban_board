@@ -3,5 +3,12 @@
     "counterAppBarTitle": "Counter",
     "@counterAppBarTitle": {
         "description": "Text shown in the AppBar of the Counter Page"
-    }
+    },
+    "lblKanbanBoard": "Kanban Board",
+    "lblLanguage": "Language",
+    "lblProfile": "Profile",
+    "lblTheme": "Theme",
+    "lblDark": "Dark",
+    "lblLight": "Light",
+    "lblSystem": "System"
 }

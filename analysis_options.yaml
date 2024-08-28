@@ -1,3 +1,8 @@
+analyzer:
+  errors:
+    lines_longer_than_80_chars: ignore
+    invalid_annotation_target: ignore
+    inference_failure_on_collection_literal: ignore
 include: package:very_good_analysis/analysis_options.5.1.0.yaml
 linter:
   rules:
