@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kanban_board/l10n/l10n.dart';
 import 'package:kanban_board/views/activity/components/activity_history_widget.dart';
 
 class ActivityHistoryScreen extends StatefulWidget {
@@ -18,9 +19,10 @@ class ActivityHistoryScreen extends StatefulWidget {
 class _ActivityHistoryScreenState extends State<ActivityHistoryScreen> {
   @override
   Widget build(BuildContext context) {
+    final appLocalizations = context.l10n;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Activity History'),
+        title: Text(appLocalizations.lblActivityHistory),
       ),
       body: Container(
         padding: const EdgeInsets.all(20),

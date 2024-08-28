@@ -1,6 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:kanban_board/l10n/l10n.dart';
 import 'package:kanban_board/models/project_model.dart';
 import 'package:kanban_board/repositories/project_repository.dart';
 import 'package:kanban_board/utils/extensions.dart';
@@ -88,6 +89,7 @@ class ProjectCubit extends Cubit<ProjectState> {
 
   void showAddProjectBottomBar(BuildContext context) {
     final projectNameController = TextEditingController();
+    final AppLocalizations appLocalizations = context.l10n;
     showModalBottomSheet<void>(
       context: context,
       builder: (context) {
@@ -98,15 +100,18 @@ class ProjectCubit extends Cubit<ProjectState> {
             children: [
               10.height,
               Text(
-                'Create a new project',
+                appLocalizations.lblCreateNewProject,
+                // 'Create a new project',
                 style: Theme.of(context).textTheme.headlineMedium,
               ),
 
               10.height,
               TextField(
                 controller: projectNameController,
-                decoration:
-                    const InputDecoration(hintText: 'Enter Project Name'),
+                decoration: InputDecoration(
+                  hintText: appLocalizations.lblEnterProjectName,
+                  // 'Enter Project Name',
+                ),
               ),
               20.height,
               Align(
@@ -117,7 +122,10 @@ class ProjectCubit extends Cubit<ProjectState> {
                     // close the bottom sheet
                     Navigator.pop(context);
                   },
-                  child: const Text('Create Project'),
+                  child: Text(
+                    appLocalizations.lblCreateProject,
+                    // 'Create Project',
+                  ),
                 ),
               ),
               10.height,

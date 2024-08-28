@@ -349,30 +349,6 @@ class TaskCubit extends Cubit<TaskState> {
     showModalBottomSheet<void>(
       context: context,
       builder: (context) {
-        // return AlertDialog(
-        //   title: ,
-        //   content: ,
-        //   actions: [
-        //     TextButton(
-        //       onPressed: () {
-        //         Navigator.of(context).pop();
-        //       },
-        //       child: const Text('Cancel'),
-        //     ),
-        //     ElevatedButton(
-        //       onPressed: () {
-        //         createTask(
-        //           content: contentController.text,
-        //           dueString: dueStringController.text,
-        //           dueLang: dueLangController.text,
-        //           priority: int.tryParse(priorityController.text),
-        //         );
-        //         Navigator.of(context).pop();
-        //       },
-        //       child: const Text('Create'),
-        //     ),
-        //   ],
-        // );
         return StatefulBuilder(
           builder: (context, state) {
             return Padding(
@@ -380,25 +356,31 @@ class TaskCubit extends Cubit<TaskState> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Align(
+                  Align(
                     alignment: Alignment.topLeft,
                     child: Text(
-                      'Create New Task',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      appLocalizations.lblCreateNewProject,
+                      // 'Create New Task',
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   10.height,
                   TextField(
                     controller: contentController,
-                    decoration:
-                        const InputDecoration(hintText: 'Enter task content'),
+                    decoration: InputDecoration(
+                      hintText: appLocalizations.lblEnterTaskContent,
+                      // 'Enter task content',
+                    ),
                   ),
                   10.height,
                   TextField(
                     controller: descriptionController,
-                    decoration: const InputDecoration(
-                      hintText: 'Enter task description (optional)',
+                    decoration: InputDecoration(
+                      hintText:
+                          '${appLocalizations.lblEnterTaskContent} (${appLocalizations.lblOptional})',
                     ),
                     minLines: 3,
                     maxLines: 5,
@@ -437,7 +419,7 @@ class TaskCubit extends Cubit<TaskState> {
                           hint: Text(
                             priorityController.text.isNotEmpty
                                 ? priorityController.text
-                                : 'Priority',
+                                : appLocalizations.lblPriority,
                           ),
                           underline: Container(
                             height: 2,
@@ -500,7 +482,7 @@ class TaskCubit extends Cubit<TaskState> {
                               Text(
                                 dueStringController.text.isNotEmpty
                                     ? dueStringController.text
-                                    : 'Select Due Date',
+                                    : appLocalizations.lblSelectDueDate,
                               ),
                             ],
                           ),
@@ -537,7 +519,7 @@ class TaskCubit extends Cubit<TaskState> {
                       Navigator.of(context).pop();
                     },
                     child: isEdit
-                        ? const Text('Update Task')
+                        ? Text(appLocalizations.lblUpdateTask)
                         : Text(appLocalizations.lblCreateTask),
                   ),
                   10.height,

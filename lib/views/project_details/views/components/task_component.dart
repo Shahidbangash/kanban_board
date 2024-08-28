@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kanban_board/app/view/app.dart';
 import 'package:kanban_board/cubit/task_cubit.dart';
 import 'package:kanban_board/cubit/theme_cubit.dart';
+import 'package:kanban_board/l10n/l10n.dart';
 import 'package:kanban_board/models/task_model.dart';
 import 'package:kanban_board/repositories/task_repository.dart';
 import 'package:kanban_board/views/task_details/views/task_details_screen.dart';
@@ -20,6 +21,7 @@ class TaskComponent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var isCompleted = task.isCompleted ?? false;
+    final appLocalizations = AppLocalizations.of(context);
     return InkWell(
       onTap: () {
         Navigator.of(context).push(
@@ -87,7 +89,7 @@ class TaskComponent extends StatelessWidget {
                   itemBuilder: (context) {
                     return [
                       PopupMenuItem<void>(
-                        child: const Text('Edit Task'),
+                        child: Text(appLocalizations.lblEditTask),
                         onTap: () {
                           log('Edit task');
                           TaskCubit(TaskRepository()).showAddTaskDialog(
@@ -100,7 +102,7 @@ class TaskComponent extends StatelessWidget {
                         },
                       ),
                       PopupMenuItem<void>(
-                        child: const Text('Delete Task'),
+                        child: Text(appLocalizations.lblDeleteTask),
                         onTap: () {
                           log('Delete task');
 
