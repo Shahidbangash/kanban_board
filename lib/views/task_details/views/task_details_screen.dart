@@ -8,6 +8,7 @@ import 'package:kanban_board/models/task_model.dart';
 import 'package:kanban_board/repositories/comments_repository.dart';
 import 'package:kanban_board/utils/extensions.dart';
 import 'package:kanban_board/utils/isar.dart';
+import 'package:kanban_board/utils/middleware.dart';
 import 'package:kanban_board/views/task_details/components/task_details.dart';
 
 class TaskDetailsScreen extends StatelessWidget {

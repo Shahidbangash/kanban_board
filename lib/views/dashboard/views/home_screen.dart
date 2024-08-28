@@ -17,12 +17,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   TextEditingController projectNameController = TextEditingController();
-  late Isar isar;
+  Isar isar = IsarService().isarInstance;
 
   @override
   void initState() {
     super.initState();
-    isar = IsarService().isarInstance;
+    // isar = IsarService().isarInstance;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // SyncMiddleware(isar: isar);
       // Trigger fetching all projects using TaskCubit

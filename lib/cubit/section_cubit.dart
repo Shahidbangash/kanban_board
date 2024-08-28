@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:kanban_board/models/project_model.dart';
 import 'package:kanban_board/models/section_model.dart';
 import 'package:kanban_board/repositories/section_repository.dart';
+import 'package:kanban_board/utils/middleware.dart';
 import 'package:kanban_board/views/project_details/views/components/add_section_ui.dart';
 // import 'section_repository.dart';
 
@@ -129,9 +130,12 @@ class SectionCubit extends Cubit<SectionState> {
 
       if (success) {
         emit(SectionDeleted(sectionId));
-        await fetchSectionsForProject(
-          projectId,
-        ); // Re-fetch sections after deletion
+
+        await SyncMiddleware().deleteSection(sectionId);
+
+        // await fetchSectionsForProject(
+        //   projectId,
+        // ); // Re-fetch sections after deletion
       } else {
         emit(const SectionError('Failed to delete section.'));
       }

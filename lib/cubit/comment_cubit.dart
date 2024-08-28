@@ -1,7 +1,9 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:kanban_board/models/task_comment_model.dart';
+import 'package:kanban_board/models/task_model.dart';
 import 'package:kanban_board/repositories/comments_repository.dart';
+import 'package:kanban_board/utils/activity_services.dart';
 import 'package:kanban_board/utils/middleware.dart';
 
 // States for CommentCubit
@@ -89,6 +91,17 @@ class CommentCubit extends Cubit<CommentState> {
         // IsarService().isarInstance.comments.put(comment);
         await SyncMiddleware().syncLocalWithRemoteComments(
           [comment],
+        );
+
+        await SyncMiddleware().addCommentCountToTask(
+          comment.taskId ?? '',
+        );
+
+        // Log the activity of adding a comment
+        await ActivityService().logActivity(
+          description: 'Comment added: ${comment.content}',
+          taskId: comment.taskId,
+          projectId: comment.projectId,
         );
         emit(CommentCreated(comment));
         if (commentData['task_id'] != null) {

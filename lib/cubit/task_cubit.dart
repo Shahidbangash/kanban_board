@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:kanban_board/models/section_model.dart';
 import 'package:kanban_board/models/task_model.dart';
 import 'package:kanban_board/repositories/task_repository.dart';
+import 'package:kanban_board/utils/activity_services.dart';
 import 'package:kanban_board/utils/extensions.dart';
 import 'package:kanban_board/utils/middleware.dart';
 
@@ -286,6 +287,13 @@ class TaskCubit extends Cubit<TaskState> {
     if (taskModel != null) {
       await SyncMiddleware().syncLocalWithRemoteTasks([taskModel]);
     }
+
+    // Log the activity of moving the task
+    await ActivityService().logActivity(
+      description: 'Task moved from ${fromSection.name} to ${toSection.name}',
+      taskId: task.idFromBackend ?? task.id,
+      projectId: task.projectId,
+    );
 
     // now fetch the tasks again
     // await fetchActiveTasks(
