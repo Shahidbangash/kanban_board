@@ -98,6 +98,31 @@ const TaskModelSchema = IsarGeneratedSchema(
         name: 'url',
         type: IsarType.string,
       ),
+      IsarPropertySchema(
+        name: 'startTime',
+        type: IsarType.dateTime,
+      ),
+      IsarPropertySchema(
+        name: 'stopTime',
+        type: IsarType.dateTime,
+      ),
+      IsarPropertySchema(
+        name: 'elapsedTime',
+        type: IsarType.long,
+      ),
+      IsarPropertySchema(
+        name: 'isTimerRunning',
+        type: IsarType.bool,
+      ),
+      IsarPropertySchema(
+        name: 'completionDate',
+        type: IsarType.dateTime,
+      ),
+      IsarPropertySchema(
+        name: 'timeIntervals',
+        type: IsarType.objectList,
+        target: 'TimeInterval',
+      ),
     ],
     indexes: [],
   ),
@@ -106,7 +131,7 @@ const TaskModelSchema = IsarGeneratedSchema(
     deserialize: deserializeTaskModel,
     deserializeProperty: deserializeTaskModelProp,
   ),
-  embeddedSchemas: [DueSchema, DurationModelSchema],
+  embeddedSchemas: [DueSchema, DurationModelSchema, TimeIntervalSchema],
 );
 
 @isarProtected
@@ -237,6 +262,37 @@ int serializeTaskModel(IsarWriter writer, TaskModel object) {
       IsarCore.writeString(writer, 19, value);
     }
   }
+  IsarCore.writeLong(writer, 20,
+      object.startTime?.toUtc().microsecondsSinceEpoch ?? -9223372036854775808);
+  IsarCore.writeLong(writer, 21,
+      object.stopTime?.toUtc().microsecondsSinceEpoch ?? -9223372036854775808);
+  IsarCore.writeLong(writer, 22, object.elapsedTime ?? -9223372036854775808);
+  {
+    final value = object.isTimerRunning;
+    if (value == null) {
+      IsarCore.writeNull(writer, 23);
+    } else {
+      IsarCore.writeBool(writer, 23, value);
+    }
+  }
+  IsarCore.writeLong(
+      writer,
+      24,
+      object.completionDate?.toUtc().microsecondsSinceEpoch ??
+          -9223372036854775808);
+  {
+    final list = object.timeIntervals;
+    final listWriter = IsarCore.beginList(writer, 25, list.length);
+    for (var i = 0; i < list.length; i++) {
+      {
+        final value = list[i];
+        final objectWriter = IsarCore.beginObject(listWriter, i);
+        serializeTimeInterval(objectWriter, value);
+        IsarCore.endObject(listWriter, objectWriter);
+      }
+    }
+    IsarCore.endList(writer, listWriter);
+  }
   return Isar.fastHash(object.id);
 }
 
@@ -348,6 +404,80 @@ TaskModel deserializeTaskModel(IsarReader reader) {
   _parentId = IsarCore.readString(reader, 18);
   final String? _url;
   _url = IsarCore.readString(reader, 19);
+  final DateTime? _startTime;
+  {
+    final value = IsarCore.readLong(reader, 20);
+    if (value == -9223372036854775808) {
+      _startTime = null;
+    } else {
+      _startTime =
+          DateTime.fromMicrosecondsSinceEpoch(value, isUtc: true).toLocal();
+    }
+  }
+  final DateTime? _stopTime;
+  {
+    final value = IsarCore.readLong(reader, 21);
+    if (value == -9223372036854775808) {
+      _stopTime = null;
+    } else {
+      _stopTime =
+          DateTime.fromMicrosecondsSinceEpoch(value, isUtc: true).toLocal();
+    }
+  }
+  final int? _elapsedTime;
+  {
+    final value = IsarCore.readLong(reader, 22);
+    if (value == -9223372036854775808) {
+      _elapsedTime = null;
+    } else {
+      _elapsedTime = value;
+    }
+  }
+  final bool? _isTimerRunning;
+  {
+    if (IsarCore.readNull(reader, 23)) {
+      _isTimerRunning = null;
+    } else {
+      _isTimerRunning = IsarCore.readBool(reader, 23);
+    }
+  }
+  final DateTime? _completionDate;
+  {
+    final value = IsarCore.readLong(reader, 24);
+    if (value == -9223372036854775808) {
+      _completionDate = null;
+    } else {
+      _completionDate =
+          DateTime.fromMicrosecondsSinceEpoch(value, isUtc: true).toLocal();
+    }
+  }
+  final List<TimeInterval> _timeIntervals;
+  {
+    final length = IsarCore.readList(reader, 25, IsarCore.readerPtrPtr);
+    {
+      final reader = IsarCore.readerPtr;
+      if (reader.isNull) {
+        _timeIntervals = const [];
+      } else {
+        final list =
+            List<TimeInterval>.filled(length, TimeInterval(), growable: true);
+        for (var i = 0; i < length; i++) {
+          {
+            final objectReader = IsarCore.readObject(reader, i);
+            if (objectReader.isNull) {
+              list[i] = TimeInterval();
+            } else {
+              final embedded = deserializeTimeInterval(objectReader);
+              IsarCore.freeReader(objectReader);
+              list[i] = embedded;
+            }
+          }
+        }
+        IsarCore.freeReader(reader);
+        _timeIntervals = list;
+      }
+    }
+  }
   final object = TaskModel(
     creatorId: _creatorId,
     createdAt: _createdAt,
@@ -368,6 +498,12 @@ TaskModel deserializeTaskModel(IsarReader reader) {
     sectionId: _sectionId,
     parentId: _parentId,
     url: _url,
+    startTime: _startTime,
+    stopTime: _stopTime,
+    elapsedTime: _elapsedTime,
+    isTimerRunning: _isTimerRunning,
+    completionDate: _completionDate,
+    timeIntervals: _timeIntervals,
   );
   return object;
 }
@@ -481,6 +617,80 @@ dynamic deserializeTaskModelProp(IsarReader reader, int property) {
       return IsarCore.readString(reader, 18);
     case 19:
       return IsarCore.readString(reader, 19);
+    case 20:
+      {
+        final value = IsarCore.readLong(reader, 20);
+        if (value == -9223372036854775808) {
+          return null;
+        } else {
+          return DateTime.fromMicrosecondsSinceEpoch(value, isUtc: true)
+              .toLocal();
+        }
+      }
+    case 21:
+      {
+        final value = IsarCore.readLong(reader, 21);
+        if (value == -9223372036854775808) {
+          return null;
+        } else {
+          return DateTime.fromMicrosecondsSinceEpoch(value, isUtc: true)
+              .toLocal();
+        }
+      }
+    case 22:
+      {
+        final value = IsarCore.readLong(reader, 22);
+        if (value == -9223372036854775808) {
+          return null;
+        } else {
+          return value;
+        }
+      }
+    case 23:
+      {
+        if (IsarCore.readNull(reader, 23)) {
+          return null;
+        } else {
+          return IsarCore.readBool(reader, 23);
+        }
+      }
+    case 24:
+      {
+        final value = IsarCore.readLong(reader, 24);
+        if (value == -9223372036854775808) {
+          return null;
+        } else {
+          return DateTime.fromMicrosecondsSinceEpoch(value, isUtc: true)
+              .toLocal();
+        }
+      }
+    case 25:
+      {
+        final length = IsarCore.readList(reader, 25, IsarCore.readerPtrPtr);
+        {
+          final reader = IsarCore.readerPtr;
+          if (reader.isNull) {
+            return const [];
+          } else {
+            final list = List<TimeInterval>.filled(length, TimeInterval(),
+                growable: true);
+            for (var i = 0; i < length; i++) {
+              {
+                final objectReader = IsarCore.readObject(reader, i);
+                if (objectReader.isNull) {
+                  list[i] = TimeInterval();
+                } else {
+                  final embedded = deserializeTimeInterval(objectReader);
+                  IsarCore.freeReader(objectReader);
+                  list[i] = embedded;
+                }
+              }
+            }
+            IsarCore.freeReader(reader);
+            return list;
+          }
+        }
+      }
     default:
       throw ArgumentError('Unknown property: $property');
   }
@@ -504,6 +714,11 @@ sealed class _TaskModelUpdate {
     String? sectionId,
     String? parentId,
     String? url,
+    DateTime? startTime,
+    DateTime? stopTime,
+    int? elapsedTime,
+    bool? isTimerRunning,
+    DateTime? completionDate,
   });
 }
 
@@ -530,6 +745,11 @@ class _TaskModelUpdateImpl implements _TaskModelUpdate {
     Object? sectionId = ignore,
     Object? parentId = ignore,
     Object? url = ignore,
+    Object? startTime = ignore,
+    Object? stopTime = ignore,
+    Object? elapsedTime = ignore,
+    Object? isTimerRunning = ignore,
+    Object? completionDate = ignore,
   }) {
     return collection.updateProperties([
           id
@@ -549,6 +769,11 @@ class _TaskModelUpdateImpl implements _TaskModelUpdate {
           if (sectionId != ignore) 17: sectionId as String?,
           if (parentId != ignore) 18: parentId as String?,
           if (url != ignore) 19: url as String?,
+          if (startTime != ignore) 20: startTime as DateTime?,
+          if (stopTime != ignore) 21: stopTime as DateTime?,
+          if (elapsedTime != ignore) 22: elapsedTime as int?,
+          if (isTimerRunning != ignore) 23: isTimerRunning as bool?,
+          if (completionDate != ignore) 24: completionDate as DateTime?,
         }) >
         0;
   }
@@ -572,6 +797,11 @@ sealed class _TaskModelUpdateAll {
     String? sectionId,
     String? parentId,
     String? url,
+    DateTime? startTime,
+    DateTime? stopTime,
+    int? elapsedTime,
+    bool? isTimerRunning,
+    DateTime? completionDate,
   });
 }
 
@@ -598,6 +828,11 @@ class _TaskModelUpdateAllImpl implements _TaskModelUpdateAll {
     Object? sectionId = ignore,
     Object? parentId = ignore,
     Object? url = ignore,
+    Object? startTime = ignore,
+    Object? stopTime = ignore,
+    Object? elapsedTime = ignore,
+    Object? isTimerRunning = ignore,
+    Object? completionDate = ignore,
   }) {
     return collection.updateProperties(id, {
       if (creatorId != ignore) 1: creatorId as String?,
@@ -615,6 +850,11 @@ class _TaskModelUpdateAllImpl implements _TaskModelUpdateAll {
       if (sectionId != ignore) 17: sectionId as String?,
       if (parentId != ignore) 18: parentId as String?,
       if (url != ignore) 19: url as String?,
+      if (startTime != ignore) 20: startTime as DateTime?,
+      if (stopTime != ignore) 21: stopTime as DateTime?,
+      if (elapsedTime != ignore) 22: elapsedTime as int?,
+      if (isTimerRunning != ignore) 23: isTimerRunning as bool?,
+      if (completionDate != ignore) 24: completionDate as DateTime?,
     });
   }
 }
@@ -642,6 +882,11 @@ sealed class _TaskModelQueryUpdate {
     String? sectionId,
     String? parentId,
     String? url,
+    DateTime? startTime,
+    DateTime? stopTime,
+    int? elapsedTime,
+    bool? isTimerRunning,
+    DateTime? completionDate,
   });
 }
 
@@ -668,6 +913,11 @@ class _TaskModelQueryUpdateImpl implements _TaskModelQueryUpdate {
     Object? sectionId = ignore,
     Object? parentId = ignore,
     Object? url = ignore,
+    Object? startTime = ignore,
+    Object? stopTime = ignore,
+    Object? elapsedTime = ignore,
+    Object? isTimerRunning = ignore,
+    Object? completionDate = ignore,
   }) {
     return query.updateProperties(limit: limit, {
       if (creatorId != ignore) 1: creatorId as String?,
@@ -685,6 +935,11 @@ class _TaskModelQueryUpdateImpl implements _TaskModelQueryUpdate {
       if (sectionId != ignore) 17: sectionId as String?,
       if (parentId != ignore) 18: parentId as String?,
       if (url != ignore) 19: url as String?,
+      if (startTime != ignore) 20: startTime as DateTime?,
+      if (stopTime != ignore) 21: stopTime as DateTime?,
+      if (elapsedTime != ignore) 22: elapsedTime as int?,
+      if (isTimerRunning != ignore) 23: isTimerRunning as bool?,
+      if (completionDate != ignore) 24: completionDate as DateTime?,
     });
   }
 }
@@ -719,6 +974,11 @@ class _TaskModelQueryBuilderUpdateImpl implements _TaskModelQueryUpdate {
     Object? sectionId = ignore,
     Object? parentId = ignore,
     Object? url = ignore,
+    Object? startTime = ignore,
+    Object? stopTime = ignore,
+    Object? elapsedTime = ignore,
+    Object? isTimerRunning = ignore,
+    Object? completionDate = ignore,
   }) {
     final q = query.build();
     try {
@@ -738,6 +998,11 @@ class _TaskModelQueryBuilderUpdateImpl implements _TaskModelQueryUpdate {
         if (sectionId != ignore) 17: sectionId as String?,
         if (parentId != ignore) 18: parentId as String?,
         if (url != ignore) 19: url as String?,
+        if (startTime != ignore) 20: startTime as DateTime?,
+        if (stopTime != ignore) 21: stopTime as DateTime?,
+        if (elapsedTime != ignore) 22: elapsedTime as int?,
+        if (isTimerRunning != ignore) 23: isTimerRunning as bool?,
+        if (completionDate != ignore) 24: completionDate as DateTime?,
       });
     } finally {
       q.close();
@@ -3464,6 +3729,436 @@ extension TaskModelQueryFilter
       );
     });
   }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition> startTimeIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const IsNullCondition(property: 20));
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      startTimeIsNotNull() {
+    return QueryBuilder.apply(not(), (query) {
+      return query.addFilterCondition(const IsNullCondition(property: 20));
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition> startTimeEqualTo(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        EqualCondition(
+          property: 20,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      startTimeGreaterThan(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        GreaterCondition(
+          property: 20,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      startTimeGreaterThanOrEqualTo(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        GreaterOrEqualCondition(
+          property: 20,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition> startTimeLessThan(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        LessCondition(
+          property: 20,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      startTimeLessThanOrEqualTo(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        LessOrEqualCondition(
+          property: 20,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition> startTimeBetween(
+    DateTime? lower,
+    DateTime? upper,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        BetweenCondition(
+          property: 20,
+          lower: lower,
+          upper: upper,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition> stopTimeIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const IsNullCondition(property: 21));
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      stopTimeIsNotNull() {
+    return QueryBuilder.apply(not(), (query) {
+      return query.addFilterCondition(const IsNullCondition(property: 21));
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition> stopTimeEqualTo(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        EqualCondition(
+          property: 21,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition> stopTimeGreaterThan(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        GreaterCondition(
+          property: 21,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      stopTimeGreaterThanOrEqualTo(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        GreaterOrEqualCondition(
+          property: 21,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition> stopTimeLessThan(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        LessCondition(
+          property: 21,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      stopTimeLessThanOrEqualTo(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        LessOrEqualCondition(
+          property: 21,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition> stopTimeBetween(
+    DateTime? lower,
+    DateTime? upper,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        BetweenCondition(
+          property: 21,
+          lower: lower,
+          upper: upper,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      elapsedTimeIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const IsNullCondition(property: 22));
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      elapsedTimeIsNotNull() {
+    return QueryBuilder.apply(not(), (query) {
+      return query.addFilterCondition(const IsNullCondition(property: 22));
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition> elapsedTimeEqualTo(
+    int? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        EqualCondition(
+          property: 22,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      elapsedTimeGreaterThan(
+    int? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        GreaterCondition(
+          property: 22,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      elapsedTimeGreaterThanOrEqualTo(
+    int? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        GreaterOrEqualCondition(
+          property: 22,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition> elapsedTimeLessThan(
+    int? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        LessCondition(
+          property: 22,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      elapsedTimeLessThanOrEqualTo(
+    int? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        LessOrEqualCondition(
+          property: 22,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition> elapsedTimeBetween(
+    int? lower,
+    int? upper,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        BetweenCondition(
+          property: 22,
+          lower: lower,
+          upper: upper,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      isTimerRunningIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const IsNullCondition(property: 23));
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      isTimerRunningIsNotNull() {
+    return QueryBuilder.apply(not(), (query) {
+      return query.addFilterCondition(const IsNullCondition(property: 23));
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      isTimerRunningEqualTo(
+    bool? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        EqualCondition(
+          property: 23,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      completionDateIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const IsNullCondition(property: 24));
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      completionDateIsNotNull() {
+    return QueryBuilder.apply(not(), (query) {
+      return query.addFilterCondition(const IsNullCondition(property: 24));
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      completionDateEqualTo(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        EqualCondition(
+          property: 24,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      completionDateGreaterThan(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        GreaterCondition(
+          property: 24,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      completionDateGreaterThanOrEqualTo(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        GreaterOrEqualCondition(
+          property: 24,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      completionDateLessThan(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        LessCondition(
+          property: 24,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      completionDateLessThanOrEqualTo(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        LessOrEqualCondition(
+          property: 24,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      completionDateBetween(
+    DateTime? lower,
+    DateTime? upper,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        BetweenCondition(
+          property: 24,
+          lower: lower,
+          upper: upper,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      timeIntervalsIsEmpty() {
+    return not().timeIntervalsIsNotEmpty();
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterFilterCondition>
+      timeIntervalsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const GreaterOrEqualCondition(property: 25, value: null),
+      );
+    });
+  }
 }
 
 extension TaskModelQueryObject
@@ -3774,6 +4469,66 @@ extension TaskModelQuerySortBy on QueryBuilder<TaskModel, TaskModel, QSortBy> {
       );
     });
   }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterSortBy> sortByStartTime() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(20);
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterSortBy> sortByStartTimeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(20, sort: Sort.desc);
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterSortBy> sortByStopTime() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(21);
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterSortBy> sortByStopTimeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(21, sort: Sort.desc);
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterSortBy> sortByElapsedTime() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(22);
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterSortBy> sortByElapsedTimeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(22, sort: Sort.desc);
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterSortBy> sortByIsTimerRunning() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(23);
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterSortBy> sortByIsTimerRunningDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(23, sort: Sort.desc);
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterSortBy> sortByCompletionDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(24);
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterSortBy> sortByCompletionDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(24, sort: Sort.desc);
+    });
+  }
 }
 
 extension TaskModelQuerySortThenBy
@@ -3991,6 +4746,66 @@ extension TaskModelQuerySortThenBy
       return query.addSortBy(19, sort: Sort.desc, caseSensitive: caseSensitive);
     });
   }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterSortBy> thenByStartTime() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(20);
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterSortBy> thenByStartTimeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(20, sort: Sort.desc);
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterSortBy> thenByStopTime() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(21);
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterSortBy> thenByStopTimeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(21, sort: Sort.desc);
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterSortBy> thenByElapsedTime() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(22);
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterSortBy> thenByElapsedTimeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(22, sort: Sort.desc);
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterSortBy> thenByIsTimerRunning() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(23);
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterSortBy> thenByIsTimerRunningDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(23, sort: Sort.desc);
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterSortBy> thenByCompletionDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(24);
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterSortBy> thenByCompletionDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(24, sort: Sort.desc);
+    });
+  }
 }
 
 extension TaskModelQueryWhereDistinct
@@ -4098,6 +4913,38 @@ extension TaskModelQueryWhereDistinct
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(19, caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterDistinct> distinctByStartTime() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(20);
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterDistinct> distinctByStopTime() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(21);
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterDistinct> distinctByElapsedTime() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(22);
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterDistinct>
+      distinctByIsTimerRunning() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(23);
+    });
+  }
+
+  QueryBuilder<TaskModel, TaskModel, QAfterDistinct>
+      distinctByCompletionDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(24);
     });
   }
 }
@@ -4217,6 +5064,43 @@ extension TaskModelQueryProperty1
       return query.addProperty(19);
     });
   }
+
+  QueryBuilder<TaskModel, DateTime?, QAfterProperty> startTimeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addProperty(20);
+    });
+  }
+
+  QueryBuilder<TaskModel, DateTime?, QAfterProperty> stopTimeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addProperty(21);
+    });
+  }
+
+  QueryBuilder<TaskModel, int?, QAfterProperty> elapsedTimeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addProperty(22);
+    });
+  }
+
+  QueryBuilder<TaskModel, bool?, QAfterProperty> isTimerRunningProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addProperty(23);
+    });
+  }
+
+  QueryBuilder<TaskModel, DateTime?, QAfterProperty> completionDateProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addProperty(24);
+    });
+  }
+
+  QueryBuilder<TaskModel, List<TimeInterval>, QAfterProperty>
+      timeIntervalsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addProperty(25);
+    });
+  }
 }
 
 extension TaskModelQueryProperty2<R>
@@ -4334,6 +5218,44 @@ extension TaskModelQueryProperty2<R>
   QueryBuilder<TaskModel, (R, String?), QAfterProperty> urlProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addProperty(19);
+    });
+  }
+
+  QueryBuilder<TaskModel, (R, DateTime?), QAfterProperty> startTimeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addProperty(20);
+    });
+  }
+
+  QueryBuilder<TaskModel, (R, DateTime?), QAfterProperty> stopTimeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addProperty(21);
+    });
+  }
+
+  QueryBuilder<TaskModel, (R, int?), QAfterProperty> elapsedTimeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addProperty(22);
+    });
+  }
+
+  QueryBuilder<TaskModel, (R, bool?), QAfterProperty> isTimerRunningProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addProperty(23);
+    });
+  }
+
+  QueryBuilder<TaskModel, (R, DateTime?), QAfterProperty>
+      completionDateProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addProperty(24);
+    });
+  }
+
+  QueryBuilder<TaskModel, (R, List<TimeInterval>), QAfterProperty>
+      timeIntervalsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addProperty(25);
     });
   }
 }
@@ -4456,6 +5378,46 @@ extension TaskModelQueryProperty3<R1, R2>
   QueryBuilder<TaskModel, (R1, R2, String?), QOperations> urlProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addProperty(19);
+    });
+  }
+
+  QueryBuilder<TaskModel, (R1, R2, DateTime?), QOperations>
+      startTimeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addProperty(20);
+    });
+  }
+
+  QueryBuilder<TaskModel, (R1, R2, DateTime?), QOperations> stopTimeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addProperty(21);
+    });
+  }
+
+  QueryBuilder<TaskModel, (R1, R2, int?), QOperations> elapsedTimeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addProperty(22);
+    });
+  }
+
+  QueryBuilder<TaskModel, (R1, R2, bool?), QOperations>
+      isTimerRunningProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addProperty(23);
+    });
+  }
+
+  QueryBuilder<TaskModel, (R1, R2, DateTime?), QOperations>
+      completionDateProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addProperty(24);
+    });
+  }
+
+  QueryBuilder<TaskModel, (R1, R2, List<TimeInterval>), QOperations>
+      timeIntervalsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addProperty(25);
     });
   }
 }
@@ -5690,3 +6652,301 @@ extension DurationModelQueryFilter
 
 extension DurationModelQueryObject
     on QueryBuilder<DurationModel, DurationModel, QFilterCondition> {}
+
+// coverage:ignore-file
+// ignore_for_file: duplicate_ignore, invalid_use_of_protected_member, lines_longer_than_80_chars, constant_identifier_names, avoid_js_rounded_ints, no_leading_underscores_for_local_identifiers, require_trailing_commas, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_in_if_null_operators, library_private_types_in_public_api, prefer_const_constructors
+// ignore_for_file: type=lint
+
+const TimeIntervalSchema = IsarGeneratedSchema(
+  schema: IsarSchema(
+    name: 'TimeInterval',
+    embedded: true,
+    properties: [
+      IsarPropertySchema(
+        name: 'startTime',
+        type: IsarType.dateTime,
+      ),
+      IsarPropertySchema(
+        name: 'endTime',
+        type: IsarType.dateTime,
+      ),
+      IsarPropertySchema(
+        name: 'isOngoing',
+        type: IsarType.bool,
+      ),
+    ],
+    indexes: [],
+  ),
+  converter: IsarObjectConverter<void, TimeInterval>(
+    serialize: serializeTimeInterval,
+    deserialize: deserializeTimeInterval,
+  ),
+);
+
+@isarProtected
+int serializeTimeInterval(IsarWriter writer, TimeInterval object) {
+  IsarCore.writeLong(writer, 1,
+      object.startTime?.toUtc().microsecondsSinceEpoch ?? -9223372036854775808);
+  IsarCore.writeLong(writer, 2,
+      object.endTime?.toUtc().microsecondsSinceEpoch ?? -9223372036854775808);
+  IsarCore.writeBool(writer, 3, object.isOngoing);
+  return 0;
+}
+
+@isarProtected
+TimeInterval deserializeTimeInterval(IsarReader reader) {
+  final DateTime? _startTime;
+  {
+    final value = IsarCore.readLong(reader, 1);
+    if (value == -9223372036854775808) {
+      _startTime = null;
+    } else {
+      _startTime =
+          DateTime.fromMicrosecondsSinceEpoch(value, isUtc: true).toLocal();
+    }
+  }
+  final DateTime? _endTime;
+  {
+    final value = IsarCore.readLong(reader, 2);
+    if (value == -9223372036854775808) {
+      _endTime = null;
+    } else {
+      _endTime =
+          DateTime.fromMicrosecondsSinceEpoch(value, isUtc: true).toLocal();
+    }
+  }
+  final bool _isOngoing;
+  {
+    if (IsarCore.readNull(reader, 3)) {
+      _isOngoing = true;
+    } else {
+      _isOngoing = IsarCore.readBool(reader, 3);
+    }
+  }
+  final object = TimeInterval(
+    startTime: _startTime,
+    endTime: _endTime,
+    isOngoing: _isOngoing,
+  );
+  return object;
+}
+
+extension TimeIntervalQueryFilter
+    on QueryBuilder<TimeInterval, TimeInterval, QFilterCondition> {
+  QueryBuilder<TimeInterval, TimeInterval, QAfterFilterCondition>
+      startTimeIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const IsNullCondition(property: 1));
+    });
+  }
+
+  QueryBuilder<TimeInterval, TimeInterval, QAfterFilterCondition>
+      startTimeIsNotNull() {
+    return QueryBuilder.apply(not(), (query) {
+      return query.addFilterCondition(const IsNullCondition(property: 1));
+    });
+  }
+
+  QueryBuilder<TimeInterval, TimeInterval, QAfterFilterCondition>
+      startTimeEqualTo(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        EqualCondition(
+          property: 1,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TimeInterval, TimeInterval, QAfterFilterCondition>
+      startTimeGreaterThan(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        GreaterCondition(
+          property: 1,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TimeInterval, TimeInterval, QAfterFilterCondition>
+      startTimeGreaterThanOrEqualTo(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        GreaterOrEqualCondition(
+          property: 1,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TimeInterval, TimeInterval, QAfterFilterCondition>
+      startTimeLessThan(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        LessCondition(
+          property: 1,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TimeInterval, TimeInterval, QAfterFilterCondition>
+      startTimeLessThanOrEqualTo(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        LessOrEqualCondition(
+          property: 1,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TimeInterval, TimeInterval, QAfterFilterCondition>
+      startTimeBetween(
+    DateTime? lower,
+    DateTime? upper,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        BetweenCondition(
+          property: 1,
+          lower: lower,
+          upper: upper,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TimeInterval, TimeInterval, QAfterFilterCondition>
+      endTimeIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const IsNullCondition(property: 2));
+    });
+  }
+
+  QueryBuilder<TimeInterval, TimeInterval, QAfterFilterCondition>
+      endTimeIsNotNull() {
+    return QueryBuilder.apply(not(), (query) {
+      return query.addFilterCondition(const IsNullCondition(property: 2));
+    });
+  }
+
+  QueryBuilder<TimeInterval, TimeInterval, QAfterFilterCondition>
+      endTimeEqualTo(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        EqualCondition(
+          property: 2,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TimeInterval, TimeInterval, QAfterFilterCondition>
+      endTimeGreaterThan(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        GreaterCondition(
+          property: 2,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TimeInterval, TimeInterval, QAfterFilterCondition>
+      endTimeGreaterThanOrEqualTo(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        GreaterOrEqualCondition(
+          property: 2,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TimeInterval, TimeInterval, QAfterFilterCondition>
+      endTimeLessThan(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        LessCondition(
+          property: 2,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TimeInterval, TimeInterval, QAfterFilterCondition>
+      endTimeLessThanOrEqualTo(
+    DateTime? value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        LessOrEqualCondition(
+          property: 2,
+          value: value,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TimeInterval, TimeInterval, QAfterFilterCondition>
+      endTimeBetween(
+    DateTime? lower,
+    DateTime? upper,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        BetweenCondition(
+          property: 2,
+          lower: lower,
+          upper: upper,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TimeInterval, TimeInterval, QAfterFilterCondition>
+      isOngoingEqualTo(
+    bool value,
+  ) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        EqualCondition(
+          property: 3,
+          value: value,
+        ),
+      );
+    });
+  }
+}
+
+extension TimeIntervalQueryObject
+    on QueryBuilder<TimeInterval, TimeInterval, QFilterCondition> {}

@@ -25,6 +25,12 @@ class TaskModel {
     this.sectionId,
     this.parentId,
     this.url,
+    this.startTime,
+    this.stopTime,
+    this.elapsedTime,
+    this.isTimerRunning,
+    this.completionDate,
+    this.timeIntervals = const [],
   });
 
   String? creatorId;
@@ -49,6 +55,14 @@ class TaskModel {
   String? sectionId;
   String? parentId;
   String? url;
+  DateTime? startTime;
+  DateTime? stopTime;
+  int? elapsedTime;
+  bool? isTimerRunning;
+  // bool? isCompleted;
+  DateTime? completionDate;
+  List<TimeInterval> timeIntervals; // List of time intervals
+  // bool? isTimerRunning; // Indicates if the timer is currently running
 
   // Static constructor for safe parsing and error handling
   static TaskModel? fromJson(Map<String, dynamic>? json) {
@@ -81,6 +95,30 @@ class TaskModel {
         sectionId: json['section_id'] as String?,
         parentId: json['parent_id'] as String?,
         url: json['url'] as String?,
+        startTime: DateTime.tryParse('${json['startTime']}'),
+        stopTime: DateTime.tryParse('${json['stopTime']}'),
+        elapsedTime: int.tryParse('${json['elapsedTime']}'),
+        isTimerRunning: json['isTimerRunning'] as bool?,
+        completionDate: DateTime.tryParse('${json['completionDate']}'),
+        timeIntervals: json['timeIntervals'] != null
+            ? (json['timeIntervals'] as List)
+                .map(
+                  (dynamic e) {
+                    if (e is Map) {
+                      return TimeInterval(
+                        startTime: DateTime.tryParse('${e['startTime']}'),
+                        endTime: DateTime.tryParse('${e['endTime']}'),
+                        isOngoing: '${e['isOngoing']}' == 'true',
+                      );
+                    }
+                    return null;
+                  },
+                )
+                .toList()
+                .where((element) => element != null)
+                .cast<TimeInterval>()
+                .toList()
+            : [],
       );
     } catch (error, stackTrace) {
       log('Error: $error');
@@ -111,6 +149,20 @@ class TaskModel {
       'parent_id': parentId,
       'url': url,
       'idFromBackend': idFromBackend,
+      'startTime': startTime?.toIso8601String(),
+      'stopTime': stopTime?.toIso8601String(),
+      'elapsedTime': elapsedTime,
+      'isTimerRunning': isTimerRunning,
+      'completionDate': completionDate?.toIso8601String(),
+      'timeIntervals': timeIntervals
+          .map(
+            (e) => {
+              'startTime': e.startTime?.toIso8601String(),
+              'endTime': e.endTime?.toIso8601String(),
+              'isOngoing': e.isOngoing,
+            },
+          )
+          .toList(),
     };
   }
 }
@@ -195,4 +247,16 @@ class DurationModel {
       'unit': unit,
     };
   }
+}
+
+@embedded
+class TimeInterval {
+  TimeInterval({
+    this.startTime,
+    this.endTime,
+    this.isOngoing = true,
+  });
+  DateTime? startTime;
+  DateTime? endTime;
+  bool isOngoing;
 }

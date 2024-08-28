@@ -2,6 +2,8 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:kanban_board/models/task_comment_model.dart';
 import 'package:kanban_board/repositories/comments_repository.dart';
+import 'package:kanban_board/utils/isar.dart';
+import 'package:kanban_board/utils/middleware.dart';
 
 // States for CommentCubit
 abstract class CommentState extends Equatable {
@@ -85,6 +87,12 @@ class CommentCubit extends Cubit<CommentState> {
       final comment = await commentRepository.createComment(commentData);
 
       if (comment != null) {
+        // IsarService().isarInstance.comments.put(comment);
+        await SyncMiddleware(
+          isar: IsarService().isarInstance,
+        ).syncLocalWithRemoteComments(
+          [comment],
+        );
         emit(CommentCreated(comment));
         if (commentData['task_id'] != null) {
           await fetchComments(

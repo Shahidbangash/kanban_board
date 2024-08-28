@@ -261,17 +261,36 @@ class ProjectDetailsScreen extends StatefulWidget {
 }
 
 class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
-  final AppFlowyBoardController controller = AppFlowyBoardController(
-    onMoveGroup: (fromGroupId, fromIndex, toGroupId, toIndex) {
-      log('Moved group from $fromIndex to $toIndex');
-    },
-    onMoveGroupItem: (groupId, fromIndex, toIndex) {
-      log('Moved $groupId:$fromIndex to $groupId:$toIndex');
-    },
-    onMoveGroupItemToGroup: (fromGroupId, fromIndex, toGroupId, toIndex) {
-      log('Moved $fromGroupId:$fromIndex to $toGroupId:$toIndex');
-    },
-  );
+  late AppFlowyBoardController controller;
+
+  // void moveCard(
+  //   String fromGroupId,
+  //   int fromIndex,
+  //   String toGroupId,
+  //   int toIndex,
+  // ) {
+  //   try {
+  //     final sectionTasks = <String, List<TaskModel>>{};
+
+  //     final sections = IsarService()
+  //         .isarInstance
+  //         .sectionModels
+  //         .where()
+  //         .projectIdEqualTo(widget.projectId)
+  //         .findAll();
+
+  //     for (final section in sections) {
+  //       sectionTasks[section.idFromBackend ?? section.id] = IsarService()
+  //           .isarInstance
+  //           .taskModels
+  //           .where()
+  //           .sectionIdEqualTo(section.id)
+  //           .findAll();
+  //     }
+  //   } catch (error, stackTrace) {
+  //     log('Error: $error', stackTrace: stackTrace);
+  //   }
+  // }
 
   late AppFlowyBoardScrollController boardController;
   final sectionCubit = SectionCubit(SectionRepository());
@@ -283,6 +302,57 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
   @override
   void initState() {
     super.initState();
+    controller = AppFlowyBoardController(
+      onMoveGroup: (fromGroupId, fromIndex, toGroupId, toIndex) {
+        log('Moved group from $fromIndex to $toIndex');
+      },
+      onMoveGroupItem: (groupId, fromIndex, toIndex) {
+        log('Moved $groupId:$fromIndex to $groupId:$toIndex');
+      },
+      onMoveGroupItemToGroup: (fromGroupId, fromIndex, toGroupId, toIndex) {
+        log('Moved $fromGroupId:$fromIndex to $toGroupId:$toIndex');
+
+        final task = sectionTasks[fromGroupId]?[fromIndex];
+
+        if (task == null) {
+          return;
+        }
+        final fromSection = IsarService()
+            .isarInstance
+            .sectionModels
+            .where()
+            .idEqualTo(fromGroupId)
+            .findFirst();
+
+        if (fromSection == null) {
+          return;
+        }
+        final toSection = IsarService()
+            .isarInstance
+            .sectionModels
+            .where()
+            .idEqualTo(toGroupId)
+            .findFirst();
+
+        if (toSection == null) {
+          return;
+        }
+
+        TaskCubit(TaskRepository()).onCardMoved(
+          task: task,
+          fromSection: fromSection,
+          toSection: toSection,
+        );
+
+        // TaskCubit(TaskRepository()).onCardMoved(
+        //   task: sectionTasks[''][0]!,
+        //   fromSection: fromSection,
+        //   toSection: toSection,
+        // );
+
+        // here handle the move of the task
+      },
+    );
     boardController = AppFlowyBoardScrollController();
   }
 
@@ -343,66 +413,61 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) {
-        return sectionCubit..fetchSectionsForProject(widget.projectId);
-      },
-      child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            sectionCubit.showAddSectionUi(
-              context,
-              project: widget.project,
-            );
-          },
-          child: const Icon(Icons.add),
-        ),
-        appBar: AppBar(
-          title: const Text('Project Sections'),
-        ),
-        body: RefreshIndicator(
-          onRefresh: () async {
-            await SyncMiddleware(isar: isar).syncSections(widget.projectId);
-          },
-          child: SizedBox(
-            height: context.height,
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: StreamBuilder<List<SectionModel>>(
-                stream: isar.sectionModels
-                    .where()
-                    .projectIdEqualTo(widget.projectId)
-                    .watch(fireImmediately: true),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return InkWell(
-                      onTap: () => sectionCubit.showAddSectionUi(
-                        context,
-                        project: widget.project,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Image.asset(R.ASSETS_NO_TASK_ICON_PNG),
-                          const SizedBox(height: 20),
-                          Text(
-                            'No sections found for this project',
-                            style: Theme.of(context).textTheme.titleSmall,
-                          ),
-                        ],
-                      ),
-                    );
-                  } else {
-                    final sections = snapshot.data!;
-                    _populateBoardWithSections(sections);
-                    return _buildAppFlowyBoard();
-                  }
-                },
-              ),
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          sectionCubit.showAddSectionUi(
+            context,
+            project: widget.project,
+          );
+        },
+        child: const Icon(Icons.add),
+      ),
+      appBar: AppBar(
+        title: const Text('Project Sections'),
+      ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          await SyncMiddleware(isar: isar).syncSections(widget.projectId);
+        },
+        child: SizedBox(
+          height: context.height,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: StreamBuilder<List<SectionModel>>(
+              stream: isar.sectionModels
+                  .where()
+                  .projectIdEqualTo(widget.projectId)
+                  .watch(fireImmediately: true),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return InkWell(
+                    onTap: () => sectionCubit.showAddSectionUi(
+                      context,
+                      project: widget.project,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(R.ASSETS_NO_TASK_ICON_PNG),
+                        const SizedBox(height: 20),
+                        Text(
+                          'No sections found for this project',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  final sections = snapshot.data!;
+                  _populateBoardWithSections(sections);
+                  return _buildAppFlowyBoard();
+                }
+              },
             ),
           ),
         ),

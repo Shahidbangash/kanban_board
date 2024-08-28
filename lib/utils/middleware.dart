@@ -149,7 +149,7 @@ class SyncMiddleware {
         task.idFromBackend ?? task.id,
       );
       if (remoteComments != null) {
-        await _syncLocalWithRemoteComments(remoteComments);
+        await syncLocalWithRemoteComments(remoteComments);
       }
       // await _syncLocalWithRemoteComments(remoteComments);
     }
@@ -176,8 +176,7 @@ class SyncMiddleware {
     });
   }
 
-  Future<void> _syncLocalWithRemoteComments(
-      List<Comment> remoteComments) async {
+  Future<void> syncLocalWithRemoteComments(List<Comment> remoteComments) async {
     await isar.write((isar) async {
       isar.comments.putAll(remoteComments);
     });
