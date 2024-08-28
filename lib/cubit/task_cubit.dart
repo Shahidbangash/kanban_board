@@ -183,9 +183,14 @@ class TaskCubit extends Cubit<TaskState> {
         emit(TaskClosed(task));
         task.isCompleted = true;
 
-        await SyncMiddleware().syncLocalWithRemoteTasks([
-          task,
-        ]);
+        await SyncMiddleware().syncLocalWithRemoteTasks([task]);
+        await ActivityService().logActivity(
+          description:
+              'Task `${task.content}` Completed in `${task.sectionId}` section',
+          taskId: task.idFromBackend ?? task.id,
+          projectId: task.projectId,
+        );
+
         // await fetchActiveTasks(
         //   sectionId: task.sectionId,
         //   projectId: task.projectId,
@@ -211,10 +216,12 @@ class TaskCubit extends Cubit<TaskState> {
         emit(TaskReopened(task));
         task.isCompleted = false;
         await SyncMiddleware().syncLocalWithRemoteTasks([task]);
-        // await fetchActiveTasks(
-        //   sectionId: task.sectionId,
-        //   projectId: task.projectId,
-        // ); // Re-fetch tasks to update the list
+        await ActivityService().logActivity(
+          description:
+              'Task `${task.content}` Re-Opened in `${task.sectionId}` section',
+          taskId: task.idFromBackend ?? task.id,
+          projectId: task.projectId,
+        );
       } else {
         emit(const TaskError('Failed to reopen task.'));
       }

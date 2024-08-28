@@ -15,10 +15,11 @@ class ActivityService {
       ..dateTime = DateTime.now()
       ..description = description
       ..taskId = taskId
-      ..projectId = projectId;
+      ..projectId = projectId
+      ..id = '${isar.activitys.count() + 1}';
 
     await isar.write((isar) async {
-      isar.activitys.putAll([activity]);
+      isar.activitys.put(activity);
     });
   }
 
