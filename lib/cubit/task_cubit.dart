@@ -359,7 +359,7 @@ class TaskCubit extends Cubit<TaskState> {
                   Align(
                     alignment: Alignment.topLeft,
                     child: Text(
-                      appLocalizations.lblCreateNewProject,
+                      appLocalizations.lblCreateNewTask,
                       // 'Create New Task',
                       style: const TextStyle(
                         fontSize: 20,

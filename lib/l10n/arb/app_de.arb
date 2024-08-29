@@ -38,6 +38,8 @@
     "lblSelectDueDate": "Fälligkeitsdatum auswählen",
     "lblEnterProjectName": "Projektnamen eingeben",
     "lblCreateProject" : "Projekt erstellen",
-    "lblNoSectionsFound": "Keine Abschnitte gefunden"
+    "lblNoSectionsFound": "Keine Abschnitte gefunden",
+    "lblCreateNewTask": "Neue Aufgabe erstellen",
+    "lblDeleteSection": "Abschnitt löschen"
     
 }

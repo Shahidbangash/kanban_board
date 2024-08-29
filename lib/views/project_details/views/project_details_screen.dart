@@ -139,7 +139,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var appLocalizations = context.l10n;
+    final appLocalizations = context.l10n;
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -230,7 +230,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
 
   Widget _buildAppFlowyBoard() {
     final AppLocalizations appLocalizations = context.l10n;
-    var config = AppFlowyBoardConfig(
+    final config = AppFlowyBoardConfig(
       groupBackgroundColor: context.read<ThemeCubit>().isLightTheme
           ? const Color(0xFFE0E7FF)
           : const Color(0xFF1E293B),
@@ -295,7 +295,7 @@ class _ProjectDetailsScreenState extends State<ProjectDetailsScreen> {
               return [
                 PopupMenuItem(
                   value: 'delete',
-                  child: Text(appLocalizations.lblDeleteTask),
+                  child: Text(appLocalizations.lblDeleteSection),
                 ),
               ];
             },
