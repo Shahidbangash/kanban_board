@@ -38,7 +38,9 @@
     "lblSelectDueDate": "Select Due Date",
     "lblEnterProjectName": "Enter Project Name",
     "lblCreateProject" : "Create Project",
-    "lblNoSectionsFound": "No Sections Found"
+    "lblNoSectionsFound": "No Sections Found",
+    "lblCreateNewTask": "Create New Task",
+    "lblDeleteSection": "Delete Section"
 
 
 }
