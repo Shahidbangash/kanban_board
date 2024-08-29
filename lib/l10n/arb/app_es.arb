@@ -38,6 +38,8 @@
     "lblSelectDueDate": "Seleccionar Fecha de Vencimiento",
     "lblEnterProjectName": "Introduzca el Nombre del Proyecto",
     "lblCreateProject" : "Crear Proyecto",
-    "lblNoSectionsFound": "No se encontraron secciones"
+    "lblNoSectionsFound": "No se encontraron secciones",
+    "lblCreateNewTask": "Crear Nueva Tarea",
+    "lblDeleteSection": "Eliminar Sección"
 
 }
